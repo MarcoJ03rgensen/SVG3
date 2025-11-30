@@ -572,11 +572,31 @@
       // Update rotation controller target and center camera
       if (selected && meshes.has(selected)) {
         const selObj = meshes.get(selected);
-        rotationController.setTarget(selObj);
-        // ensure selected object is visible and center on it
+        console.debug('[SVG3] selection changed:', selected, selObj);
+        // ensure selected object is visible
         selObj.visible = true;
-        centerCameraOnScene();
+        // update world matrix so bounding box calculations are accurate
+        try { selObj.updateMatrixWorld(true); } catch (err) {}
+
+        // Center camera on the selected object specifically
+        try {
+          const selBox = new THREE.Box3().setFromObject(selObj);
+          if (!selBox.isEmpty()) {
+            const center = selBox.getCenter(new THREE.Vector3());
+            const size = selBox.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const distance = maxDim / (2 * Math.tan(Math.PI * camera.fov / 360));
+            camera.position.copy(center);
+            camera.position.z += distance * 1.5;
+            camera.lookAt(center);
+          }
+        } catch (err) {
+          console.warn('[SVG3] failed to center on selection', err);
+        }
+
+        rotationController.setTarget(selObj);
       } else {
+        console.debug('[SVG3] selection cleared');
         rotationController.setTarget(scene);
         centerCameraOnScene();
       }
