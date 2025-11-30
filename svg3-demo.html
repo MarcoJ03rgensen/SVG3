@@ -576,61 +576,91 @@
     document.getElementById('objectSelect').addEventListener('change', (e) => {
       const selected = e.target.value;
 
-      // Toggle visibility: if no selection, show all; otherwise show only selected mesh
-      meshes.forEach((obj, id) => {
-        const isMesh = obj && (obj.isMesh === true || obj.type === 'Mesh');
-        if (!isMesh) return;
-        if (!selected) {
-          obj.visible = true;
-        } else {
-          obj.visible = id === selected;
-        }
-      });
+      // Toggle visibility: if no selection, show all; otherwise show only the selected mesh or group's meshes
+      if (!selected) {
+        meshes.forEach((obj, id) => {
+          if (obj && (obj.isMesh === true || obj.type === 'Mesh')) obj.visible = true;
+        });
+        rotationController.setTarget(scene);
+        centerCameraOnScene();
+        return;
+      }
 
-      // Update rotation controller target and center camera
-      if (selected && meshes.has(selected)) {
+      // If selected corresponds to an object we built, handle group vs mesh selection
+      if (meshes.has(selected)) {
         const selObj = meshes.get(selected);
         console.debug('[SVG3] selection changed:', selected, selObj);
-        // ensure selected object is visible
-        selObj.visible = true;
-        // update world matrix so bounding box calculations are accurate
-        try { selObj.updateMatrixWorld(true); } catch (err) {}
 
-        // Center camera on the selected object specifically
+        // hide all meshes first
+        meshes.forEach((obj, id) => {
+          if (obj && (obj.isMesh === true || obj.type === 'Mesh')) obj.visible = false;
+        });
+
+        // If a mesh was selected, show only that mesh
+        if (selObj && (selObj.isMesh === true || selObj.type === 'Mesh')) {
+          selObj.visible = true;
+          try { selObj.updateMatrixWorld(true); } catch (err) {}
+          // center on that mesh
+          try {
+            const selBox = new THREE.Box3().setFromObject(selObj);
+            if (!selBox.isEmpty()) {
+              const center = selBox.getCenter(new THREE.Vector3());
+              const size = selBox.getSize(new THREE.Vector3());
+              const maxDim = Math.max(size.x, size.y, size.z);
+              const vFOV = THREE.MathUtils.degToRad(camera.fov);
+              const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
+              const distV = maxDim / (2 * Math.tan(vFOV / 2));
+              const distH = maxDim / (2 * Math.tan(hFOV / 2));
+              let distance = Math.max(distV, distH);
+              const minDistance = Math.max(1, maxDim * 2);
+              distance = Math.max(distance, minDistance);
+              const padding = 1.5;
+              camera.position.set(center.x, center.y, center.z + distance * padding);
+              camera.lookAt(center);
+              camera.updateProjectionMatrix();
+            }
+          } catch (err) {
+            console.warn('[SVG3] failed to center on selection', err);
+          }
+          rotationController.setTarget(selObj);
+          return;
+        }
+
+        // If a group was selected, show all descendant meshes of that group
+        try { selObj.updateMatrixWorld(true); } catch (err) {}
+        selObj.traverse(o => {
+          if (o.isMesh) o.visible = true;
+        });
+        rotationController.setTarget(selObj);
+        // center on the group as a whole
         try {
           const selBox = new THREE.Box3().setFromObject(selObj);
           if (!selBox.isEmpty()) {
             const center = selBox.getCenter(new THREE.Vector3());
             const size = selBox.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-
-            // Compute required distance to fit object in view for both vertical and horizontal FOV
             const vFOV = THREE.MathUtils.degToRad(camera.fov);
             const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
             const distV = maxDim / (2 * Math.tan(vFOV / 2));
             const distH = maxDim / (2 * Math.tan(hFOV / 2));
             let distance = Math.max(distV, distH);
-
-            // Enforce a sensible minimum distance so very small objects don't zoom in too close
             const minDistance = Math.max(1, maxDim * 2);
             distance = Math.max(distance, minDistance);
-
             const padding = 1.5;
-            // Position camera along +Z relative to the object's center to avoid flipping
             camera.position.set(center.x, center.y, center.z + distance * padding);
             camera.lookAt(center);
             camera.updateProjectionMatrix();
           }
         } catch (err) {
-          console.warn('[SVG3] failed to center on selection', err);
+          console.warn('[SVG3] failed to center on group selection', err);
         }
-
-        rotationController.setTarget(selObj);
-      } else {
-        console.debug('[SVG3] selection cleared');
-        rotationController.setTarget(scene);
-        centerCameraOnScene();
+        return;
       }
+
+      // If selected value doesn't map to a built object, clear selection
+      console.debug('[SVG3] selection id not recognized:', selected);
+      rotationController.setTarget(scene);
+      centerCameraOnScene();
     });
 
     // File input
