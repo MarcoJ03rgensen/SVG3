@@ -35,54 +35,54 @@
         <group id="tree-root" position="0, -2, 0">
             
             <!-- 1. Base Trunk -->
-            <mesh geometry="geo-trunk-base" material="mat-bark" position="0, 1.0, 0">
+                <mesh id="trunk-base" geometry="geo-trunk-base" material="mat-bark" position="0, 1.0, 0">
                 <!-- Gentle sway at base -->
                 <animate attributeName="rotation" values="0,0,0.5; 0,0,-0.5; 0,0,0.5" dur="7s" repeatCount="indefinite" />
 
                 <!-- 2. Mid Trunk -->
-                <group position="0, 1.0, 0">
-                    <mesh geometry="geo-trunk-mid" material="mat-bark" position="0, 0.9, 0" />
+                    <group id="trunk-mid-group" position="0, 1.0, 0">
+                        <mesh id="trunk-mid" geometry="geo-trunk-mid" material="mat-bark" position="0, 0.9, 0" />
                     <animate attributeName="rotation" values="1,0,1; -1,0,-1; 1,0,1" dur="5s" repeatCount="indefinite" />
 
                     <!-- Lower Branches -->
-                    <group position="0, 0.5, 0" rotation="0, 0, 45">
-                        <mesh geometry="geo-branch" material="mat-bark" position="0, 0.6, 0" />
+                        <group id="branch-lower-A" position="0, 0.5, 0" rotation="0, 0, 45">
+                            <mesh id="branch-A" geometry="geo-branch" material="mat-bark" position="0, 0.6, 0" />
                         <!-- Leaf Clusters -->
-                        <group position="0, 1.0, 0">
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-dark" position="0,0,0" scale="1.5, 0.8, 1.5" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-light" position="0.3, 0.4, 0.2" scale="1.2, 0.8, 1.2" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-dark" position="-0.3, 0.3, -0.2" scale="1.2, 0.8, 1.2" />
-                        </group>
+                            <group id="leaf-cluster-A" position="0, 1.0, 0">
+                                <mesh id="leaf-A1" geometry="geo-leaf-puff" material="mat-leaf-dark" position="0,0,0" scale="1.5, 0.8, 1.5" />
+                                <mesh id="leaf-A2" geometry="geo-leaf-puff" material="mat-leaf-light" position="0.3, 0.4, 0.2" scale="1.2, 0.8, 1.2" />
+                                <mesh id="leaf-A3" geometry="geo-leaf-puff" material="mat-leaf-dark" position="-0.3, 0.3, -0.2" scale="1.2, 0.8, 1.2" />
+                            </group>
                         <animate attributeName="rotation" values="0,0,45; 0,0,48; 0,0,45" dur="3s" repeatCount="indefinite" />
                     </group>
 
-                    <group position="0, 0.7, 0" rotation="0, 120, 50">
-                        <mesh geometry="geo-branch" material="mat-bark" position="0, 0.6, 0" />
+                        <group id="branch-lower-B" position="0, 0.7, 0" rotation="0, 120, 50">
+                            <mesh id="branch-B" geometry="geo-branch" material="mat-bark" position="0, 0.6, 0" />
                          <!-- Leaf Clusters -->
-                        <group position="0, 1.0, 0">
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-dark" position="0,0,0" scale="1.5, 0.8, 1.5" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-light" position="0.3, 0.4, 0.2" scale="1.2, 0.8, 1.2" />
-                        </group>
+                            <group id="leaf-cluster-B" position="0, 1.0, 0">
+                                <mesh id="leaf-B1" geometry="geo-leaf-puff" material="mat-leaf-dark" position="0,0,0" scale="1.5, 0.8, 1.5" />
+                                <mesh id="leaf-B2" geometry="geo-leaf-puff" material="mat-leaf-light" position="0.3, 0.4, 0.2" scale="1.2, 0.8, 1.2" />
+                            </group>
                         <animate attributeName="rotation" values="0,120,50; 0,120,53; 0,120,50" dur="3.5s" repeatCount="indefinite" />
                     </group>
 
                     <!-- 3. Top Trunk -->
-                    <group position="0, 1.8, 0">
-                        <mesh geometry="geo-trunk-top" material="mat-bark" position="0, 0.9, 0" />
+                        <group id="trunk-top-group" position="0, 1.8, 0">
+                            <mesh id="trunk-top" geometry="geo-trunk-top" material="mat-bark" position="0, 0.9, 0" />
                         <!-- Top sway (more intense) -->
                         <animate attributeName="rotation" values="2,0,0; -2,0,0; 2,0,0" dur="4s" repeatCount="indefinite" />
                         
                         <!-- Top Crown (Dense leaves) -->
-                        <group position="0, 1.5, 0">
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0, 0" scale="2, 1, 2" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-dark" position="0.6, -0.2, 0" scale="1.5, 1, 1.5" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-dark" position="-0.6, -0.2, 0" scale="1.5, 1, 1.5" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0.5, 0.6" scale="1.5, 1, 1.5" />
-                            <mesh geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0.5, -0.6" scale="1.5, 1, 1.5" />
+                            <group id="top-crown" position="0, 1.5, 0">
+                                <mesh id="leaf-top-1" geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0, 0" scale="2, 1, 2" />
+                                <mesh id="leaf-top-2" geometry="geo-leaf-puff" material="mat-leaf-dark" position="0.6, -0.2, 0" scale="1.5, 1, 1.5" />
+                                <mesh id="leaf-top-3" geometry="geo-leaf-puff" material="mat-leaf-dark" position="-0.6, -0.2, 0" scale="1.5, 1, 1.5" />
+                                <mesh id="leaf-top-4" geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0.5, 0.6" scale="1.5, 1, 1.5" />
+                                <mesh id="leaf-top-5" geometry="geo-leaf-puff" material="mat-leaf-light" position="0, 0.5, -0.6" scale="1.5, 1, 1.5" />
                             
-                            <!-- Breathing animation for leaves -->
-                            <animate attributeName="scale" values="1,1,1; 1.05,1.05,1.05; 1,1,1" dur="2s" repeatCount="indefinite" />
-                        </group>
+                                <!-- Breathing animation for leaves -->
+                                <animate attributeName="scale" values="1,1,1; 1.05,1.05,1.05; 1,1,1" dur="2s" repeatCount="indefinite" />
+                            </group>
                     </group>
                 </group>
             </mesh>
