@@ -586,10 +586,23 @@
             const center = selBox.getCenter(new THREE.Vector3());
             const size = selBox.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            const distance = maxDim / (2 * Math.tan(Math.PI * camera.fov / 360));
-            camera.position.copy(center);
-            camera.position.z += distance * 1.5;
+
+            // Compute required distance to fit object in view for both vertical and horizontal FOV
+            const vFOV = THREE.MathUtils.degToRad(camera.fov);
+            const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
+            const distV = maxDim / (2 * Math.tan(vFOV / 2));
+            const distH = maxDim / (2 * Math.tan(hFOV / 2));
+            let distance = Math.max(distV, distH);
+
+            // Enforce a sensible minimum distance so very small objects don't zoom in too close
+            const minDistance = Math.max(1, maxDim * 2);
+            distance = Math.max(distance, minDistance);
+
+            const padding = 1.5;
+            // Position camera along +Z relative to the object's center to avoid flipping
+            camera.position.set(center.x, center.y, center.z + distance * padding);
             camera.lookAt(center);
+            camera.updateProjectionMatrix();
           }
         } catch (err) {
           console.warn('[SVG3] failed to center on selection', err);
