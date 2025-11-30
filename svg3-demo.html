@@ -570,8 +570,8 @@
       distance = Math.max(distance, minDistance);
 
       // Place camera on Z axis relative to center and give extra padding
-      const padding = 1.8; // slightly larger padding for tall/narrow objects
-      camera.position.set(center.x, center.y, center.z + distance * padding);
+      const padding = 2.0; // increased padding for better framing
+      camera.position.set(center.x, 2, center.z + distance * padding);
       camera.lookAt(center);
 
       // Update controls if needed
