@@ -464,7 +464,7 @@
           const rot = el.attrs?.rotation || [0, 0, 0];
           group.position.set(...pos);
           group.rotation.set(...rot);
-          group.visible = false;
+          group.visible = true; // Groups always visible
           meshes.set(el.id, group);
           parentGroup.add(group);
           el.children?.forEach(child => buildElement(child, group));
@@ -508,14 +508,16 @@
     // Object selection
     document.getElementById('objectSelect').addEventListener('change', (e) => {
       const selected = e.target.value;
-      meshes.forEach((mesh, id) => {
-        mesh.visible = id === selected;
+      meshes.forEach((obj, id) => {
+        if (obj.type === 'Mesh') {
+          obj.visible = id === selected;
+        }
       });
       // Update rotation controller target
       if (selected) {
         rotationController.setTarget(meshes.get(selected));
       } else {
-        rotationController.setTarget(scene); // or null
+        rotationController.setTarget(scene);
       }
     });
 
