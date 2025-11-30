@@ -30,9 +30,9 @@ SVG3 is an **XML-based 3D graphics format** that bridges SVG simplicity with 3D 
 
 - **Easier tooling & conversion**: Because SVG3 is data-driven (JSON-like after parsing), you can convert it to engine-specific formats (Unity, Godot, glTF helpers) or export a JSON scene for server-side pipelines.
 
-- **When to use which**:
-  - Use **SVG3** when you want portable, human-editable scenes, content uploaded by non-developers, or a unified declarative format across tools.
-  - Use **plain Three.js code** when you need highly custom runtime logic, procedural generation, or low-level performance optimizations that rely on custom JS.
+ - **When to use which**:
+  - **SVG3:** Pick SVG3 when you want a human-editable, portable scene format that can safely be stored, inspected, or edited without running arbitrary code. SVG3 is ideal for content authored by non-developers (CMS uploads, designer hand-offs), for sharing scenes across tools, and for deterministic pipelines that convert, validate, or re-render the data server-side. Its declarative nature makes it easy to diff, review, and sanitize.
+  - **Plain Three.js code:** Use raw Three.js when you need procedural generation, custom runtime logic, or very low-level performance tuning that requires executing JavaScript. Three.js code is more powerful for highly interactive systems but is less portable and requires trusting/executing code supplied by others.
 
 The rest of this README and the codebase show how to parse `.svg3` files and render them with Three.js while keeping these advantages.
 
