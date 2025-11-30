@@ -440,7 +440,17 @@ export class SVG3ThreeRenderer {
       antialias: true, 
       alpha: true 
     });
-    this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+    // Ensure correct device pixel ratio and drawing buffer size for crisp rendering
+    const layoutWidth = Math.max(1, Math.floor(this.canvas.clientWidth));
+    const layoutHeight = Math.max(1, Math.floor(this.canvas.clientHeight));
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = Math.max(1, Math.floor(layoutWidth * dpr));
+    this.canvas.height = Math.max(1, Math.floor(layoutHeight * dpr));
+    this.canvas.style.width = layoutWidth + 'px';
+    this.canvas.style.height = layoutHeight + 'px';
+
+    this.renderer.setPixelRatio(dpr);
+    this.renderer.setSize(layoutWidth, layoutHeight, false);
     this.renderer.setClearColor(0x1a1a1a, 1);
     this.renderer.shadowMap.enabled = true;
 
@@ -450,6 +460,45 @@ export class SVG3ThreeRenderer {
     this.buildMaterials(THREE);
     this.buildScenes(THREE);
     this.setupAnimations();
+
+    // Debug overlay showing canvas and camera info
+    try {
+      const parent = this.canvas.parentElement || document.body;
+      let overlay = parent.querySelector('#svg3-debug-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'svg3-debug-overlay';
+        overlay.style.position = 'absolute';
+        overlay.style.right = '8px';
+        overlay.style.top = '8px';
+        overlay.style.padding = '8px 10px';
+        overlay.style.background = 'rgba(0,0,0,0.5)';
+        overlay.style.color = '#fff';
+        overlay.style.fontSize = '12px';
+        overlay.style.fontFamily = 'Courier New, monospace';
+        overlay.style.zIndex = 9999;
+        parent.appendChild(overlay);
+      }
+      this._debugOverlay = overlay;
+      const updateDebug = () => {
+        const w = this.canvas.clientWidth;
+        const h = this.canvas.clientHeight;
+        const d = window.devicePixelRatio || 1;
+        const cam = Array.from(this.cameras.values())[0];
+        const aspect = cam ? cam.aspect.toFixed(2) : 'n/a';
+        const objs = this.meshes.size;
+        overlay.innerText = `size: ${w}x${h}\nDPR: ${d}\naspect: ${aspect}\nobjects: ${objs}`;
+      };
+      this._updateDebug = updateDebug;
+      updateDebug();
+      this._debugInterval = setInterval(updateDebug, 800);
+    } catch (e) {
+      // ignore debug overlay errors
+    }
+
+    // Listen for window resize and update renderer and camera accordingly
+    this._boundOnResize = this.onWindowResize.bind(this);
+    window.addEventListener('resize', this._boundOnResize);
 
     return { scene: this.scene, renderer: this.renderer };
   }
@@ -692,15 +741,25 @@ export class SVG3ThreeRenderer {
   }
 
   onWindowResize() {
-    const width = this.canvas.clientWidth;
-    const height = this.canvas.clientHeight;
+    const width = Math.max(1, Math.floor(this.canvas.clientWidth));
+    const height = Math.max(1, Math.floor(this.canvas.clientHeight));
+    const dpr = window.devicePixelRatio || 1;
+
+    // Update canvas drawing buffer size
+    this.canvas.width = Math.max(1, Math.floor(width * dpr));
+    this.canvas.height = Math.max(1, Math.floor(height * dpr));
+    this.canvas.style.width = width + 'px';
+    this.canvas.style.height = height + 'px';
 
     this.cameras.forEach(camera => {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
     });
 
-    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(dpr);
+    this.renderer.setSize(width, height, false);
+
+    if (this._updateDebug) this._updateDebug();
   }
 
   dispose() {
