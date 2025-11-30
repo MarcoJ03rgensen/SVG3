@@ -769,6 +769,152 @@ export class SVG3ThreeRenderer {
   }
 }
 
+export class AnimationEngine {
+  constructor() {
+    this.activeAnimations = new Map();
+    this.clock = { time: 0, delta: 0 };
+  }
+
+  parseTime(timeStr) {
+    const match = timeStr.match(/^([\d.]+)(s|ms)?$/);
+    if (!match) return 0;
+    const value = parseFloat(match[1]);
+    const unit = match[2] || 's';
+    return unit === 'ms' ? value / 1000 : value;
+  }
+
+  registerAnimation(targetId, animationData) {
+    const key = `${targetId}-${animationData.attributeName}`;
+    this.activeAnimations.set(key, {
+      targetId,
+      ...animationData,
+      startTime: this.parseTime(animationData.begin),
+      duration: this.parseTime(animationData.dur),
+      startValue: null,
+      targetValue: null,
+      isActive: false,
+      hasStarted: false,
+      elapsed: 0,
+    });
+  }
+
+  update(deltaTime, objects) {
+    this.clock.time += deltaTime;
+    this.clock.delta = deltaTime;
+
+    this.activeAnimations.forEach((anim, key) => {
+      const obj = objects.get(anim.targetId);
+      if (!obj) return;
+
+      if (!anim.hasStarted && this.clock.time >= anim.startTime) {
+        anim.hasStarted = true;
+        anim.isActive = true;
+      }
+
+      if (anim.isActive) {
+        anim.elapsed = this.clock.time - anim.startTime;
+        const progress = Math.min(anim.elapsed / anim.duration, 1);
+        this.applySimpleAnimation(obj, anim, progress);
+
+        if (progress >= 1) {
+          anim.isActive = false;
+        }
+      }
+    });
+  }
+
+  applySimpleAnimation(obj, anim, progress) {
+    const fromValues = (anim.from || '0,0,0').split(',').map(v => parseFloat(v.trim()));
+    const toValues = (anim.to || '1,1,1').split(',').map(v => parseFloat(v.trim()));
+    const interpolated = fromValues.map((from, i) => from + (toValues[i] - from) * progress);
+
+    if (anim.attributeName === 'rotation') {
+      obj.rotation.set(...interpolated);
+    } else if (anim.attributeName === 'position') {
+      obj.position.set(...interpolated);
+    } else if (anim.attributeName === 'scale') {
+      obj.scale.set(...interpolated);
+    }
+  }
+}
+
+export class RotationController {
+  constructor(canvas, targetObject, sensitivity = 0.01) {
+    this.canvas = canvas;
+    this.targetObject = targetObject;
+    this.sensitivity = sensitivity;
+    this.isDragging = false;
+    this.previousMousePosition = { x: 0, y: 0 };
+    this.rotation = { x: 0, y: 0, z: 0 };
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    this.canvas.addEventListener('mousedown', e => this.onMouseDown(e));
+    this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+    this.canvas.addEventListener('mouseup', e => this.onMouseUp(e));
+    this.canvas.addEventListener('mouseleave', e => this.onMouseUp(e));
+    this.canvas.addEventListener('touchstart', e => this.onTouchStart(e));
+    this.canvas.addEventListener('touchmove', e => this.onTouchMove(e));
+    this.canvas.addEventListener('touchend', e => this.onTouchEnd(e));
+  }
+
+  onMouseDown(event) {
+    this.isDragging = true;
+    this.previousMousePosition = { x: event.clientX, y: event.clientY };
+  }
+
+  onMouseMove(event) {
+    if (!this.isDragging) return;
+    const deltaX = event.clientX - this.previousMousePosition.x;
+    const deltaY = event.clientY - this.previousMousePosition.y;
+    this.rotation.y += deltaX * this.sensitivity;
+    this.rotation.x += deltaY * this.sensitivity;
+    this.applyRotation();
+    this.previousMousePosition = { x: event.clientX, y: event.clientY };
+  }
+
+  onMouseUp() {
+    this.isDragging = false;
+  }
+
+  onTouchStart(event) {
+    if (event.touches.length === 1) {
+      this.isDragging = true;
+      this.previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }
+  }
+
+  onTouchMove(event) {
+    if (!this.isDragging) return;
+    const deltaX = event.touches[0].clientX - this.previousMousePosition.x;
+    const deltaY = event.touches[0].clientY - this.previousMousePosition.y;
+    this.rotation.y += deltaX * this.sensitivity;
+    this.rotation.x += deltaY * this.sensitivity;
+    this.applyRotation();
+    this.previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }
+
+  onTouchEnd() {
+    this.isDragging = false;
+  }
+
+  applyRotation() {
+    this.targetObject.rotation.x = this.rotation.x;
+    this.targetObject.rotation.y = this.rotation.y;
+    this.targetObject.rotation.z = this.rotation.z;
+  }
+
+  setSensitivity(s) {
+    this.sensitivity = s;
+  }
+
+  reset() {
+    this.rotation = { x: 0, y: 0, z: 0 };
+    this.applyRotation();
+  }
+}
+
 export default {
   SVG3Parser,
   AnimationEngine,
