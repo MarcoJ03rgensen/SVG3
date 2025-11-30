@@ -234,6 +234,7 @@ svg3-project/
 │
 ├── scenes/                       ← Custom SVG3 scenes
 │   ├── character.svg3
+│   ├── environment.svg3
 │   └── demo.svg3
 │
 ├── README.md                     ← This file
@@ -350,4 +351,4 @@ Everything is production-ready. Pick a path above and start building!
 
 **Most Popular:** Open `svg3-demo.html` → then read `QUICKSTART.md`
 
-**Happy creating! 🚀** 
+**Happy creating! 🚀**

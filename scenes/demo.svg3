@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg3 version="1.0" xmlns="http://www.w3.org/2024/svg3" viewBox="0 0 1920 1080">
+  <metadata>
+    <creator>SVG3 Demo</creator>
+    <created>2025-11-30</created>
+  </metadata>
+  
+  <defs>
+    <geometry id="box-1" type="box" width="2" height="2" depth="2" />
+    <geometry id="sphere-1" type="sphere" radius="1.5" widthSegments="32" heightSegments="32" />
+    <geometry id="torus-1" type="torus" radius="1.5" tube="0.4" radialSegments="16" tubularSegments="100" />
+    <geometry id="cylinder-1" type="cylinder" radiusTop="1" radiusBottom="1" height="2.5" />
+    
+    <material id="mat-1" type="standard" color="#32b8c6" metalness="0.7" roughness="0.3" />
+    <material id="mat-2" type="standard" color="#50b84c" metalness="0.5" roughness="0.5" />
+    <material id="mat-3" type="phong" color="#f5a623" shininess="100" />
+    <material id="mat-4" type="standard" color="#9b59b6" metalness="0.3" roughness="0.7" />
+  </defs>
+  
+  <scene id="main" camera="camera-1" ambientLight="0.6">
+    <camera id="camera-1" type="perspective" fov="75" aspect="16/9" near="0.1" far="1000" position="0,0,6" />
+    <light type="directional" intensity="1" color="#ffffff" position="5,5,5" />
+    <light type="point" intensity="0.5" color="#32b8c6" position="-3,2,3" />
+    
+    <group id="main-group" position="0,0,0" rotation="0,0,0" scale="1,1,1">
+      <mesh id="cube" geometry="box-1" material="mat-1" position="-2.5,0,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+        <animate attributeName="rotation" from="0,0,0" to="0,6.28,0" dur="8s" repeatCount="indefinite" />
+      </mesh>
+      
+      <mesh id="sphere" geometry="sphere-1" material="mat-2" position="0,0,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+        <animate attributeName="rotation" from="0,0,0" to="6.28,0,0" dur="10s" repeatCount="indefinite" />
+      </mesh>
+      
+      <mesh id="torus" geometry="torus-1" material="mat-3" position="2.5,0,0" rotation="0.5,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+        <animate attributeName="rotation" from="0.5,0,0" to="0.5,6.28,0" dur="12s" repeatCount="indefinite" />
+      </mesh>
+      
+      <mesh id="cylinder" geometry="cylinder-1" material="mat-4" position="0,-2.5,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+        <animate attributeName="rotation" from="0,0,0" to="6.28,0,0" dur="6s" repeatCount="indefinite" />
+      </mesh>
+    </group>
+  </scene>
+</svg3>

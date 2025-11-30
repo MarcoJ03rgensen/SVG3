@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SVG3 - Simple Game Character</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <canvas id="canvas" style="width: 100vw; height: 100vh; display: block;"></canvas>
+  
+  <script type="module">
+    import { SVG3Parser, SVG3ThreeRenderer, enableGameControls, GameCharacter } 
+      from '../svg3-complete.js';
+    
+    // Load character SVG3
+    const response = await fetch('../scenes/character.svg3');
+    const svgString = await response.text();
+    
+    // Setup and run
+    const parser = new SVG3Parser();
+    const sceneData = parser.parse(svgString);
+    
+    const canvas = document.getElementById('canvas');
+    const renderer = new SVG3ThreeRenderer(sceneData, canvas);
+    await renderer.init();
+    
+    const gameController = enableGameControls(renderer);
+    const character = new GameCharacter('Player', gameController, [
+      { id: 'torso', parent: null },
+      { id: 'left-arm', parent: 'torso' },
+    ]);
+    
+    renderer.animate();
+  </script>
+</body>
+</html>

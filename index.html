@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG3 - 3D Format with Game Control</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      max-width: 600px;
+      padding: 40px;
+      text-align: center;
+      background: rgba(26, 26, 46, 0.8);
+      border-radius: 12px;
+      border: 1px solid #32b8c6;
+    }
+    
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #32b8c6;
+    }
+    
+    p {
+      font-size: 1.1em;
+      margin-bottom: 30px;
+      color: #ccc;
+      line-height: 1.6;
+    }
+    
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    a {
+      display: inline-block;
+      padding: 15px 30px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 200ms ease;
+      border: 2px solid;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #32b8c6, #2180bf);
+      border-color: #32b8c6;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(50, 184, 198, 0.3);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      border-color: #32b8c6;
+      color: #32b8c6;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(50, 184, 198, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .docs {
+      text-align: left;
+      background: rgba(50, 184, 198, 0.05);
+      border: 1px solid #32b8c6;
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+    
+    .docs h3 {
+      color: #32b8c6;
+      margin-bottom: 15px;
+    }
+    
+    .docs ul {
+      list-style: none;
+      margin-bottom: 15px;
+    }
+    
+    .docs li {
+      padding: 8px 0;
+      color: #aaa;
+    }
+    
+    .docs a {
+      color: #32b8c6;
+      text-decoration: none;
+      border: none;
+      padding: 0;
+      background: none;
+    }
+    
+    .docs a:hover {
+      text-decoration: underline;
+      box-shadow: none;
+      transform: none;
+    }
+    
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #32b8c6;
+      font-size: 0.9em;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 SVG3</h1>
+    <p>3D Format with Animation, Rotation & Game Control</p>
+    
+    <div class="buttons">
+      <a href="svg3-demo.html" class="btn-primary">▶ Try Demo</a>
+      <a href="QUICKSTART.md" class="btn-secondary">📖 Quick Start</a>
+    </div>
+    
+    <div class="docs">
+      <h3>📚 Documentation</h3>
+      
+      <strong>Getting Started:</strong>
+      <ul>
+        <li><a href="QUICKSTART.md">QUICKSTART.md</a> - 5-minute setup guide</li>
+        <li><a href="INDEX.md">INDEX.md</a> - Master index & overview</li>
+      </ul>
+      
+      <strong>API Reference:</strong>
+      <ul>
+        <li><a href="SVG3-README.md">SVG3-README.md</a> - Complete API documentation</li>
+        <li><a href="SVG3-GAME-QUICK.md">SVG3-GAME-QUICK.md</a> - Game controls quick start</li>
+        <li><a href="SVG3-GAME-CONTROLS-GUIDE.md">SVG3-GAME-CONTROLS-GUIDE.md</a> - Advanced patterns</li>
+      </ul>
+      
+      <strong>Examples:</strong>
+      <ul>
+        <li><a href="svg3-demo.html">svg3-demo.html</a> - Interactive demo</li>
+        <li><a href="scenes/advanced-scene.svg3">scenes/advanced-scene.svg3</a> - Advanced scene</li>
+      </ul>
+    </div>
+    
+    <div class="footer">
+      <p>MIT License - Use freely in commercial and personal projects</p>
+      <p><strong>Latest:</strong> Skeletal animation, puppet control, state machines</p>
+    </div>
+  </div>
+</body>
+</html>

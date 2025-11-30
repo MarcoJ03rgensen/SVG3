@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg3 version="1.0" xmlns="http://www.w3.org/2024/svg3" viewBox="0 0 1920 1080">
+  
+  <metadata>
+    <creator>SVG3 Advanced Demo</creator>
+    <created>2025-11-30</created>
+    <description>Advanced SVG3 scene with multiple geometries, complex animations, and lighting</description>
+  </metadata>
+  
+  <defs>
+    <!-- GEOMETRIES - Define reusable 3D shapes -->
+    <geometry id="box-lg" type="box" width="2" height="2" depth="2" />
+    <geometry id="box-md" type="box" width="1.5" height="1.5" depth="1.5" />
+    <geometry id="box-sm" type="box" width="1" height="1" depth="1" />
+    
+    <geometry id="sphere-lg" type="sphere" radius="1.5" widthSegments="32" heightSegments="32" />
+    <geometry id="sphere-md" type="sphere" radius="1" widthSegments="32" heightSegments="32" />
+    <geometry id="sphere-sm" type="sphere" radius="0.5" widthSegments="16" heightSegments="16" />
+    
+    <geometry id="cylinder-1" type="cylinder" radiusTop="0.8" radiusBottom="0.8" height="2.5" radialSegments="32" heightSegments="1" />
+    <geometry id="cone-1" type="cylinder" radiusTop="0" radiusBottom="1" height="2" radialSegments="32" heightSegments="1" />
+    
+    <geometry id="torus-lg" type="torus" radius="1.5" tube="0.4" radialSegments="16" tubularSegments="100" />
+    <geometry id="torus-md" type="torus" radius="1" tube="0.3" radialSegments="16" tubularSegments="100" />
+    <geometry id="torus-sm" type="torus" radius="0.6" tube="0.2" radialSegments="16" tubularSegments="100" />
+    
+    <geometry id="plane-floor" type="plane" width="20" height="20" widthSegments="1" heightSegments="1" />
+    
+    <!-- MATERIALS - Define reusable materials with different properties -->
+    
+    <!-- Metallic materials -->
+    <material id="mat-cyan-metal" type="standard" color="#32b8c6" metalness="0.9" roughness="0.1" />
+    <material id="mat-green-metal" type="standard" color="#50b84c" metalness="0.8" roughness="0.2" />
+    <material id="mat-orange-metal" type="standard" color="#f5a623" metalness="0.7" roughness="0.3" />
+    <material id="mat-purple-metal" type="standard" color="#9b59b6" metalness="0.85" roughness="0.15" />
+    <material id="mat-red-metal" type="standard" color="#e74c3c" metalness="0.75" roughness="0.25" />
+    
+    <!-- Matte materials -->
+    <material id="mat-cyan-matte" type="lambert" color="#32b8c6" emissive="#000000" />
+    <material id="mat-green-matte" type="lambert" color="#50b84c" emissive="#000000" />
+    <material id="mat-floor" type="lambert" color="#1a1a2e" emissive="#000000" />
+    
+    <!-- Glossy materials -->
+    <material id="mat-gold-glossy" type="phong" color="#f1c40f" shininess="120" />
+    <material id="mat-silver-glossy" type="phong" color="#ecf0f1" shininess="100" />
+    
+    <!-- Emissive materials -->
+    <material id="mat-cyan-emissive" type="standard" color="#32b8c6" emissive="#32b8c6" emissiveIntensity="0.5" metalness="0.4" roughness="0.6" />
+    <material id="mat-purple-emissive" type="standard" color="#9b59b6" emissive="#9b59b6" emissiveIntensity="0.5" metalness="0.3" roughness="0.7" />
+  </defs>
+  
+  <!-- SCENE - Main 3D scene -->
+  <scene id="main-scene" camera="perspective-camera" ambientLight="0.4">
+    
+    <!-- CAMERA - Perspective view -->
+    <camera id="perspective-camera" 
+            type="perspective" 
+            fov="75" 
+            aspect="16/9" 
+            near="0.1" 
+            far="1000" 
+            position="0,3,8" />
+    
+    <!-- LIGHTS -->
+    
+    <!-- Main directional light (sun-like) -->
+    <light id="main-light" 
+           type="directional" 
+           intensity="0.8" 
+           color="#ffffff" 
+           position="8,8,8" 
+           target="0,0,0" />
+    
+    <!-- Secondary fill light -->
+    <light id="fill-light" 
+           type="point" 
+           intensity="0.4" 
+           color="#32b8c6" 
+           position="-5,3,0" />
+    
+    <!-- Accent light -->
+    <light id="accent-light" 
+           type="point" 
+           intensity="0.3" 
+           color="#f5a623" 
+           position="0,5,-8" />
+    
+    <!-- MAIN SCENE GROUP - All objects -->
+    <group id="scene-root" position="0,0,0" rotation="0,0,0" scale="1,1,1">
+      
+      <!-- FLOOR -->
+      <mesh id="floor" 
+            geometry="plane-floor" 
+            material="mat-floor" 
+            position="0,-1.5,0" 
+            rotation="0,0,0" 
+            scale="1,1,1" 
+            receiveShadow="true" />
+      
+      <!-- CENTRAL ROTATING GROUP -->
+      <group id="central-group" position="0,0,0" rotation="0,0,0" scale="1,1,1">
+        
+        <!-- Large sphere at center -->
+        <mesh id="center-sphere" 
+              geometry="sphere-lg" 
+              material="mat-cyan-metal" 
+              position="0,0,0" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              castShadow="true" 
+              receiveShadow="true">
+          <!-- Rotation animation -->
+          <animate attributeName="rotation" 
+                   from="0,0,0" 
+                   to="0,6.28,0" 
+                   dur="8s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <!-- Orbiting boxes around center -->
+        <group id="box-orbit-1" position="0,0,0" rotation="0,0,0">
+          <mesh id="box-1" 
+                geometry="box-md" 
+                material="mat-green-metal" 
+                position="4,0,0" 
+                rotation="0,0,0" 
+                scale="1,1,1" 
+                castShadow="true" 
+                receiveShadow="true">
+            <animate attributeName="rotation" 
+                     from="0,0,0" 
+                     to="6.28,6.28,0" 
+                     dur="6s" 
+                     repeatCount="indefinite" />
+          </mesh>
+          <animate attributeName="rotation" 
+                   from="0,0,0" 
+                   to="0,6.28,0" 
+                   dur="12s" 
+                   repeatCount="indefinite" />
+        </group>
+        
+        <!-- Second orbiting group (offset) -->
+        <group id="box-orbit-2" position="0,0,0" rotation="0,2.09,0">
+          <mesh id="box-2" 
+                geometry="box-md" 
+                material="mat-orange-metal" 
+                position="4,0,0" 
+                rotation="0,0,0" 
+                scale="1,1,1" 
+                castShadow="true" 
+                receiveShadow="true">
+            <animate attributeName="rotation" 
+                     from="0,0,0" 
+                     to="6.28,0,6.28" 
+                     dur="7s" 
+                     repeatCount="indefinite" />
+          </mesh>
+          <animate attributeName="rotation" 
+                   from="0,2.09,0" 
+                   to="0,8.37,0" 
+                   dur="12s" 
+                   repeatCount="indefinite" />
+        </group>
+        
+        <!-- Third orbiting group -->
+        <group id="box-orbit-3" position="0,0,0" rotation="0,4.19,0">
+          <mesh id="box-3" 
+                geometry="box-md" 
+                material="mat-purple-metal" 
+                position="4,0,0" 
+                rotation="0,0,0" 
+                scale="1,1,1" 
+                castShadow="true" 
+                receiveShadow="true">
+            <animate attributeName="rotation" 
+                     from="0,0,0" 
+                     to="0,6.28,6.28" 
+                     dur="5s" 
+                     repeatCount="indefinite" />
+          </mesh>
+          <animate attributeName="rotation" 
+                   from="0,4.19,0" 
+                   to="0,10.47,0" 
+                   dur="12s" 
+                   repeatCount="indefinite" />
+        </group>
+      </group>
+      
+      <!-- SECONDARY GROUP - Tori -->
+      <group id="tori-group" position="0,0,0" rotation="0,0,0">
+        
+        <!-- Vertical torus ring -->
+        <mesh id="torus-vertical" 
+              geometry="torus-lg" 
+              material="mat-cyan-emissive" 
+              position="0,0.5,0" 
+              rotation="1.57,0,0" 
+              scale="1,1,1" 
+              receiveShadow="true">
+          <animate attributeName="rotation" 
+                   from="1.57,0,0" 
+                   to="1.57,6.28,0" 
+                   dur="10s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <!-- Horizontal torus ring -->
+        <mesh id="torus-horizontal" 
+              geometry="torus-md" 
+              material="mat-purple-emissive" 
+              position="0,0.5,0" 
+              rotation="0,0,0" 
+              scale="1.2,1.2,1.2" 
+              receiveShadow="true">
+          <animate attributeName="rotation" 
+                   from="0,0,0" 
+                   to="0,-6.28,0" 
+                   dur="8s" 
+                   repeatCount="indefinite" />
+        </mesh>
+      </group>
+      
+      <!-- TERTIARY GROUP - Tall structures -->
+      <group id="structures-group" position="0,0,0">
+        
+        <!-- Left cylinder -->
+        <mesh id="cylinder-left" 
+              geometry="cylinder-1" 
+              material="mat-red-metal" 
+              position="-3.5,0,0" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              castShadow="true" 
+              receiveShadow="true">
+          <animate attributeName="scale" 
+                   values="1,1,1;1,1.3,1;1,1,1" 
+                   keyTimes="0;0.5;1" 
+                   dur="4s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <!-- Right cylinder -->
+        <mesh id="cylinder-right" 
+              geometry="cylinder-1" 
+              material="mat-green-metal" 
+              position="3.5,0,0" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              castShadow="true" 
+              receiveShadow="true">
+          <animate attributeName="scale" 
+                   values="1,1,1;1,1.2,1;1,1,1" 
+                   keyTimes="0;0.5;1" 
+                   dur="3.5s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <!-- Center cone -->
+        <mesh id="cone-center" 
+              geometry="cone-1" 
+              material="mat-gold-glossy" 
+              position="0,0,-3" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              castShadow="true" 
+              receiveShadow="true">
+          <animate attributeName="rotation" 
+                   from="0,0,0" 
+                   to="0,6.28,0" 
+                   dur="9s" 
+                   repeatCount="indefinite" />
+        </mesh>
+      </group>
+      
+      <!-- ACCENT SPHERES - Small floating spheres -->
+      <group id="accent-spheres">
+        
+        <mesh id="sphere-accent-1" 
+              geometry="sphere-sm" 
+              material="mat-cyan-matte" 
+              position="-3,-0.5,3" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              receiveShadow="true">
+          <animate attributeName="position" 
+                   values="-3,-0.5,3;-3,1,3;-3,-0.5,3" 
+                   keyTimes="0;0.5;1" 
+                   dur="3s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <mesh id="sphere-accent-2" 
+              geometry="sphere-sm" 
+              material="mat-green-matte" 
+              position="3,-0.5,3" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              receiveShadow="true">
+          <animate attributeName="position" 
+                   values="3,-0.5,3;3,1.2,3;3,-0.5,3" 
+                   keyTimes="0;0.5;1" 
+                   dur="2.5s" 
+                   repeatCount="indefinite" />
+        </mesh>
+        
+        <mesh id="sphere-accent-3" 
+              geometry="sphere-sm" 
+              material="mat-silver-glossy" 
+              position="0,-0.5,-4" 
+              rotation="0,0,0" 
+              scale="1,1,1" 
+              receiveShadow="true">
+          <animate attributeName="position" 
+                   values="0,-0.5,-4;0,1.5,-4;0,-0.5,-4" 
+                   keyTimes="0;0.5;1" 
+                   dur="3.5s" 
+                   repeatCount="indefinite" />
+        </mesh>
+      </group>
+      
+    </group>
+    
+  </scene>
+  
+</svg3>

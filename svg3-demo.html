@@ -1,0 +1,886 @@
+<!-- SVG3 Interactive Demo - Complete Working Example -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG3 - 3D Animation & Rotation Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .canvas-area {
+      flex: 1;
+      position: relative;
+      background: radial-gradient(circle at 30% 30%, #2a2a4e, #0f0f1e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .controls-panel {
+      width: 320px;
+      background: rgba(26, 26, 46, 0.95);
+      border-left: 2px solid #32b8c6;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .control-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .control-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #32b8c6;
+      border-bottom: 1px solid #32b8c6;
+      padding-bottom: 8px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #333;
+      outline: none;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #32b8c6;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(50, 184, 198, 0.5);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #32b8c6;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px rgba(50, 184, 198, 0.5);
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      background: linear-gradient(to right, #32b8c6, #50b84c);
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    .value-display {
+      font-size: 12px;
+      color: #32b8c6;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    button {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #32b8c6, #2180bf);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 200ms ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #50b84c, #32b8c6);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(50, 184, 198, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .info-box {
+      background: rgba(50, 184, 198, 0.1);
+      border: 1px solid rgba(50, 184, 198, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #ccc;
+    }
+
+    .info-box strong {
+      color: #32b8c6;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .stat-label {
+      color: #aaa;
+    }
+
+    .stat-value {
+      color: #32b8c6;
+      font-weight: 600;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: rgba(26, 26, 46, 0.85);
+      border: 1px solid #32b8c6;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 12px;
+      max-width: 300px;
+      z-index: 10;
+    }
+
+    .overlay h2 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #32b8c6;
+    }
+
+    .overlay p {
+      margin-bottom: 4px;
+      color: #aaa;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .controls-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 2px solid #32b8c6;
+        max-height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="canvas-area">
+      <canvas id="canvas"></canvas>
+      <div class="overlay">
+        <h2>🎮 SVG3 Demo</h2>
+        <p><strong>Drag</strong> to rotate the object</p>
+        <p>View animations and transforms in real-time</p>
+      </div>
+    </div>
+
+    <div class="controls-panel">
+      <div class="control-section">
+        <h3>📊 Scene Controls</h3>
+        
+        <div class="control-group">
+          <label>Ambient Light</label>
+          <input type="range" id="ambientLight" min="0" max="1" step="0.1" value="0.5">
+          <div class="value-display" id="ambientValue">0.50</div>
+        </div>
+
+        <div class="control-group">
+          <label>Rotation Sensitivity</label>
+          <input type="range" id="sensitivity" min="0.001" max="0.05" step="0.001" value="0.01">
+          <div class="value-display" id="sensitivityValue">0.010</div>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3>🎨 Material Properties</h3>
+        
+        <div class="control-group">
+          <label>Color Hue</label>
+          <input type="range" id="hue" min="0" max="360" step="1" value="200">
+          <div class="value-display" id="hueValue">#32B8C6</div>
+        </div>
+
+        <div class="control-group">
+          <label>Metalness</label>
+          <input type="range" id="metalness" min="0" max="1" step="0.05" value="0.5">
+          <div class="value-display" id="metalnessValue">0.50</div>
+        </div>
+
+        <div class="control-group">
+          <label>Roughness</label>
+          <input type="range" id="roughness" min="0" max="1" step="0.05" value="0.5">
+          <div class="value-display" id="roughnessValue">0.50</div>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <h3>⚙️ Actions</h3>
+        
+        <div class="button-group">
+          <button id="rotateBtn">↻ Auto Rotate</button>
+          <button id="resetBtn">🔄 Reset</button>
+        </div>
+        <button id="animateBtn" style="width: 100%">▶ Start Animation</button>
+      </div>
+
+      <div class="control-section">
+        <h3>📈 Stats</h3>
+        
+        <div class="stat">
+          <span class="stat-label">FPS</span>
+          <span class="stat-value" id="fps">60</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Objects</span>
+          <span class="stat-value" id="objectCount">4</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Animations</span>
+          <span class="stat-value" id="animCount">2</span>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <strong>SVG3 Format</strong><br>
+        Drag to rotate • Sliders adjust properties • Animations run smoothly
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script type="module">
+    // Import SVG3 classes
+    const SVG3_IMPLEMENTATION = `
+    export class SVG3Parser {
+      constructor() {
+        this.geometries = new Map();
+        this.materials = new Map();
+        this.animationTracks = [];
+      }
+
+      parse(svgString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svgString, 'text/xml');
+        const root = doc.documentElement;
+
+        if (root.tagName !== 'svg3') {
+          throw new Error('Invalid SVG3: root element must be <svg3>');
+        }
+
+        const scene = {
+          viewBox: root.getAttribute('viewBox'),
+          metadata: this.parseMetadata(root),
+          defs: this.parseDefs(root),
+          scenes: this.parseScenes(root),
+          animations: this.animationTracks,
+        };
+
+        return scene;
+      }
+
+      parseMetadata(root) {
+        const metadata = root.querySelector('metadata');
+        if (!metadata) return {};
+        const result = {};
+        metadata.querySelectorAll('*').forEach(el => {
+          result[el.tagName] = el.textContent;
+        });
+        return result;
+      }
+
+      parseDefs(root) {
+        const defs = root.querySelector('defs');
+        if (!defs) return { geometries: [], materials: [] };
+        return {
+          geometries: this.parseGeometries(defs),
+          materials: this.parseMaterials(defs),
+        };
+      }
+
+      parseGeometries(defsElement) {
+        const geometries = [];
+        defsElement.querySelectorAll('geometry').forEach(geom => {
+          geometries.push({
+            id: geom.id,
+            type: geom.getAttribute('type'),
+            params: this.parseAttributes(geom),
+          });
+        });
+        return geometries;
+      }
+
+      parseMaterials(defsElement) {
+        const materials = [];
+        defsElement.querySelectorAll('material').forEach(mat => {
+          materials.push({
+            id: mat.id,
+            type: mat.getAttribute('type') || 'standard',
+            params: this.parseAttributes(mat),
+          });
+        });
+        return materials;
+      }
+
+      parseScenes(root) {
+        const scenes = [];
+        root.querySelectorAll('scene').forEach(sceneEl => {
+          scenes.push({
+            id: sceneEl.id,
+            camera: sceneEl.getAttribute('camera'),
+            ambientLight: parseFloat(sceneEl.getAttribute('ambientLight') || '0.5'),
+            children: this.parseChildren(sceneEl),
+          });
+        });
+        return scenes;
+      }
+
+      parseChildren(parent) {
+        const children = [];
+        parent.children.forEach(child => {
+          if (['mesh', 'group', 'light', 'camera'].includes(child.tagName)) {
+            children.push(this.parseElement(child));
+          }
+        });
+        return children;
+      }
+
+      parseElement(el) {
+        const element = {
+          tag: el.tagName,
+          id: el.id,
+          attrs: this.parseAttributes(el),
+          animations: this.parseAnimations(el),
+        };
+
+        if (['group', 'scene'].includes(el.tagName)) {
+          element.children = this.parseChildren(el);
+        }
+
+        return element;
+      }
+
+      parseAnimations(el) {
+        const animations = [];
+        el.querySelectorAll(':scope > animate, :scope > animateTransform, :scope > set').forEach(anim => {
+          animations.push({
+            type: anim.tagName,
+            attributeName: anim.getAttribute('attributeName'),
+            from: anim.getAttribute('from'),
+            to: anim.getAttribute('to'),
+            dur: anim.getAttribute('dur') || '1s',
+            begin: anim.getAttribute('begin') || '0s',
+            end: anim.getAttribute('end'),
+            repeatCount: anim.getAttribute('repeatCount') || '1',
+            fill: anim.getAttribute('fill') || 'freeze',
+            values: anim.getAttribute('values')?.split(';'),
+            keyTimes: anim.getAttribute('keyTimes')?.split(';').map(parseFloat),
+          });
+          this.animationTracks.push({
+            targetId: el.id,
+            animation: animations[animations.length - 1],
+          });
+        });
+        return animations;
+      }
+
+      parseAttributes(el) {
+        const attrs = {};
+        Array.from(el.attributes).forEach(attr => {
+          const name = attr.name;
+          const value = attr.value;
+
+          if (['position', 'rotation', 'scale'].includes(name)) {
+            attrs[name] = value.split(',').map(v => parseFloat(v.trim()));
+          } else if (['fov', 'aspect', 'near', 'far', 'intensity', 'metalness', 'roughness', 'emissiveIntensity', 'shininess', 'opacity'].includes(name)) {
+            attrs[name] = parseFloat(value);
+          } else if (['castShadow', 'receiveShadow', 'bevelEnabled'].includes(name)) {
+            attrs[name] = value === 'true';
+          } else {
+            attrs[name] = value;
+          }
+        });
+        return attrs;
+      }
+    }
+
+    export class AnimationEngine {
+      constructor() {
+        this.activeAnimations = new Map();
+        this.clock = { time: 0, delta: 0 };
+      }
+
+      parseTime(timeStr) {
+        const match = timeStr.match(/^([\\d.]+)(s|ms)?\$/);
+        if (!match) return 0;
+        const value = parseFloat(match[1]);
+        const unit = match[2] || 's';
+        return unit === 'ms' ? value / 1000 : value;
+      }
+
+      registerAnimation(targetId, animationData) {
+        const key = \`\${targetId}-\${animationData.attributeName}\`;
+        this.activeAnimations.set(key, {
+          targetId,
+          ...animationData,
+          startTime: this.parseTime(animationData.begin),
+          duration: this.parseTime(animationData.dur),
+          startValue: null,
+          targetValue: null,
+          isActive: false,
+          hasStarted: false,
+          elapsed: 0,
+        });
+      }
+
+      update(deltaTime, objects) {
+        this.clock.time += deltaTime;
+        this.clock.delta = deltaTime;
+
+        this.activeAnimations.forEach((anim, key) => {
+          const obj = objects.get(anim.targetId);
+          if (!obj) return;
+
+          if (!anim.hasStarted && this.clock.time >= anim.startTime) {
+            anim.hasStarted = true;
+            anim.isActive = true;
+          }
+
+          if (anim.isActive) {
+            anim.elapsed = this.clock.time - anim.startTime;
+            const progress = Math.min(anim.elapsed / anim.duration, 1);
+            this.applySimpleAnimation(obj, anim, progress);
+
+            if (progress >= 1) {
+              anim.isActive = false;
+            }
+          }
+        });
+      }
+
+      applySimpleAnimation(obj, anim, progress) {
+        const fromValues = (anim.from || '0,0,0').split(',').map(v => parseFloat(v.trim()));
+        const toValues = (anim.to || '1,1,1').split(',').map(v => parseFloat(v.trim()));
+        const interpolated = fromValues.map((from, i) => from + (toValues[i] - from) * progress);
+
+        if (anim.attributeName === 'rotation') {
+          obj.rotation.set(...interpolated);
+        } else if (anim.attributeName === 'position') {
+          obj.position.set(...interpolated);
+        } else if (anim.attributeName === 'scale') {
+          obj.scale.set(...interpolated);
+        }
+      }
+    }
+
+    export class RotationController {
+      constructor(canvas, targetObject, sensitivity = 0.01) {
+        this.canvas = canvas;
+        this.targetObject = targetObject;
+        this.sensitivity = sensitivity;
+        this.isDragging = false;
+        this.previousMousePosition = { x: 0, y: 0 };
+        this.rotation = { x: 0, y: 0, z: 0 };
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.canvas.addEventListener('mousedown', e => this.onMouseDown(e));
+        this.canvas.addEventListener('mousemove', e => this.onMouseMove(e));
+        this.canvas.addEventListener('mouseup', e => this.onMouseUp(e));
+        this.canvas.addEventListener('mouseleave', e => this.onMouseUp(e));
+        this.canvas.addEventListener('touchstart', e => this.onTouchStart(e));
+        this.canvas.addEventListener('touchmove', e => this.onTouchMove(e));
+        this.canvas.addEventListener('touchend', e => this.onTouchEnd(e));
+      }
+
+      onMouseDown(event) {
+        this.isDragging = true;
+        this.previousMousePosition = { x: event.clientX, y: event.clientY };
+      }
+
+      onMouseMove(event) {
+        if (!this.isDragging) return;
+        const deltaX = event.clientX - this.previousMousePosition.x;
+        const deltaY = event.clientY - this.previousMousePosition.y;
+        this.rotation.y += deltaX * this.sensitivity;
+        this.rotation.x += deltaY * this.sensitivity;
+        this.applyRotation();
+        this.previousMousePosition = { x: event.clientX, y: event.clientY };
+      }
+
+      onMouseUp() {
+        this.isDragging = false;
+      }
+
+      onTouchStart(event) {
+        if (event.touches.length === 1) {
+          this.isDragging = true;
+          this.previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+        }
+      }
+
+      onTouchMove(event) {
+        if (!this.isDragging) return;
+        const deltaX = event.touches[0].clientX - this.previousMousePosition.x;
+        const deltaY = event.touches[0].clientY - this.previousMousePosition.y;
+        this.rotation.y += deltaX * this.sensitivity;
+        this.rotation.x += deltaY * this.sensitivity;
+        this.applyRotation();
+        this.previousMousePosition = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+      }
+
+      onTouchEnd() {
+        this.isDragging = false;
+      }
+
+      applyRotation() {
+        this.targetObject.rotation.x = this.rotation.x;
+        this.targetObject.rotation.y = this.rotation.y;
+        this.targetObject.rotation.z = this.rotation.z;
+      }
+
+      setSensitivity(s) {
+        this.sensitivity = s;
+      }
+
+      reset() {
+        this.rotation = { x: 0, y: 0, z: 0 };
+        this.applyRotation();
+      }
+    }
+    `;
+
+    eval(SVG3_IMPLEMENTATION);
+
+    // SVG3 Scene Definition
+    const svg3SceneXML = \`<?xml version="1.0" encoding="UTF-8"?>
+    <svg3 version="1.0" xmlns="http://www.w3.org/2024/svg3" viewBox="0 0 1920 1080">
+      <metadata>
+        <creator>SVG3 Demo</creator>
+        <created>2025-11-30</created>
+      </metadata>
+      
+      <defs>
+        <geometry id="box-1" type="box" width="2" height="2" depth="2" />
+        <geometry id="sphere-1" type="sphere" radius="1.5" widthSegments="32" heightSegments="32" />
+        <geometry id="torus-1" type="torus" radius="1.5" tube="0.4" radialSegments="16" tubularSegments="100" />
+        <geometry id="cylinder-1" type="cylinder" radiusTop="1" radiusBottom="1" height="2.5" />
+        
+        <material id="mat-1" type="standard" color="#32b8c6" metalness="0.7" roughness="0.3" />
+        <material id="mat-2" type="standard" color="#50b84c" metalness="0.5" roughness="0.5" />
+        <material id="mat-3" type="phong" color="#f5a623" shininess="100" />
+        <material id="mat-4" type="standard" color="#9b59b6" metalness="0.3" roughness="0.7" />
+      </defs>
+      
+      <scene id="main" camera="camera-1" ambientLight="0.6">
+        <camera id="camera-1" type="perspective" fov="75" aspect="16/9" near="0.1" far="1000" position="0,0,6" />
+        <light type="directional" intensity="1" color="#ffffff" position="5,5,5" />
+        <light type="point" intensity="0.5" color="#32b8c6" position="-3,2,3" />
+        
+        <group id="main-group" position="0,0,0" rotation="0,0,0" scale="1,1,1">
+          <mesh id="cube" geometry="box-1" material="mat-1" position="-2.5,0,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+            <animate attributeName="rotation" from="0,0,0" to="0,6.28,0" dur="8s" repeatCount="indefinite" />
+          </mesh>
+          
+          <mesh id="sphere" geometry="sphere-1" material="mat-2" position="0,0,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+            <animate attributeName="rotation" from="0,0,0" to="6.28,0,0" dur="10s" repeatCount="indefinite" />
+          </mesh>
+          
+          <mesh id="torus" geometry="torus-1" material="mat-3" position="2.5,0,0" rotation="0.5,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+            <animate attributeName="rotation" from="0.5,0,0" to="0.5,6.28,0" dur="12s" repeatCount="indefinite" />
+          </mesh>
+          
+          <mesh id="cylinder" geometry="cylinder-1" material="mat-4" position="0,-2.5,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+            <animate attributeName="rotation" from="0,0,0" to="6.28,0,0" dur="6s" repeatCount="indefinite" />
+          </mesh>
+        </group>
+      </scene>
+    </svg3>\`;
+
+    // Initialize Scene
+    const canvas = document.getElementById('canvas');
+    const parser = new SVG3Parser();
+    const sceneData = parser.parse(svg3SceneXML);
+
+    // Create Three.js renderer manually
+    const THREE = window.THREE;
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setClearColor(0x0a0a1a, 1);
+    renderer.shadowMap.enabled = true;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    camera.position.set(0, 0, 6);
+
+    // Build scene
+    const geometries = new Map();
+    const materials = new Map();
+    const meshes = new Map();
+    const animationEngine = new AnimationEngine();
+
+    // Create geometries
+    sceneData.defs.geometries.forEach(geom => {
+      let g;
+      const p = geom.params;
+      switch (geom.type) {
+        case 'box': g = new THREE.BoxGeometry(p.width || 1, p.height || 1, p.depth || 1); break;
+        case 'sphere': g = new THREE.SphereGeometry(p.radius || 1, p.widthSegments || 32, p.heightSegments || 32); break;
+        case 'cylinder': g = new THREE.CylinderGeometry(p.radiusTop || 1, p.radiusBottom || 1, p.height || 2); break;
+        case 'torus': g = new THREE.TorusGeometry(p.radius || 1, p.tube || 0.4, p.radialSegments || 16, p.tubularSegments || 100); break;
+        default: g = new THREE.BoxGeometry(1, 1, 1);
+      }
+      geometries.set(geom.id, g);
+    });
+
+    // Create materials
+    sceneData.defs.materials.forEach(mat => {
+      let m;
+      const p = mat.params;
+      if (mat.type === 'phong') {
+        m = new THREE.MeshPhongMaterial({ color: p.color || 0xffffff, shininess: p.shininess || 100 });
+      } else {
+        m = new THREE.MeshStandardMaterial({
+          color: p.color || 0xffffff,
+          metalness: p.metalness || 0,
+          roughness: p.roughness || 0.5,
+        });
+      }
+      materials.set(mat.id, m);
+    });
+
+    // Build scene graph
+    function buildElement(el, parentGroup) {
+      if (el.tag === 'mesh') {
+        const geom = geometries.get(el.attrs.geometry);
+        const mat = materials.get(el.attrs.material).clone();
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.name = el.id;
+        const pos = el.attrs.position || [0, 0, 0];
+        const rot = el.attrs.rotation || [0, 0, 0];
+        const scale = el.attrs.scale || [1, 1, 1];
+        mesh.position.set(...pos);
+        mesh.rotation.set(...rot);
+        mesh.scale.set(...scale);
+        mesh.castShadow = el.attrs.castShadow || false;
+        meshes.set(el.id, mesh);
+        parentGroup.add(mesh);
+
+        el.animations.forEach(anim => {
+          animationEngine.registerAnimation(el.id, anim);
+        });
+      } else if (el.tag === 'group') {
+        const group = new THREE.Group();
+        const pos = el.attrs?.position || [0, 0, 0];
+        const rot = el.attrs?.rotation || [0, 0, 0];
+        group.position.set(...pos);
+        group.rotation.set(...rot);
+        meshes.set(el.id, group);
+        parentGroup.add(group);
+        el.children?.forEach(child => buildElement(child, group));
+      }
+    }
+
+    sceneData.scenes[0].children.forEach(el => {
+      if (el.tag === 'light') {
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5);
+        light.castShadow = true;
+        scene.add(light);
+      } else {
+        buildElement(el, scene);
+      }
+    });
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    // Setup rotation controller
+    const mainGroup = meshes.get('main-group');
+    const rotationController = new RotationController(canvas, mainGroup, 0.01);
+
+    // Auto-rotate toggle
+    let autoRotate = false;
+    let autoRotateSpeed = 0.003;
+
+    // UI Controls
+    document.getElementById('ambientLight').addEventListener('input', e => {
+      ambientLight.intensity = parseFloat(e.target.value);
+      document.getElementById('ambientValue').textContent = parseFloat(e.target.value).toFixed(2);
+    });
+
+    document.getElementById('sensitivity').addEventListener('input', e => {
+      rotationController.setSensitivity(parseFloat(e.target.value));
+      document.getElementById('sensitivityValue').textContent = parseFloat(e.target.value).toFixed(3);
+    });
+
+    document.getElementById('hue').addEventListener('input', e => {
+      const hue = parseFloat(e.target.value);
+      const rgb = hslToRgb(hue / 360, 0.6, 0.5);
+      const hex = rgbToHex(rgb[0], rgb[1], rgb[2]);
+      document.getElementById('hueValue').textContent = hex;
+    });
+
+    document.getElementById('metalness').addEventListener('input', e => {
+      const val = parseFloat(e.target.value);
+      meshes.forEach((mesh, id) => {
+        if (mesh.material && mesh.material.metalness !== undefined) {
+          mesh.material.metalness = val;
+        }
+      });
+      document.getElementById('metalnessValue').textContent = val.toFixed(2);
+    });
+
+    document.getElementById('roughness').addEventListener('input', e => {
+      const val = parseFloat(e.target.value);
+      meshes.forEach((mesh, id) => {
+        if (mesh.material && mesh.material.roughness !== undefined) {
+          mesh.material.roughness = val;
+        }
+      });
+      document.getElementById('roughnessValue').textContent = val.toFixed(2);
+    });
+
+    document.getElementById('rotateBtn').addEventListener('click', () => {
+      autoRotate = !autoRotate;
+      document.getElementById('rotateBtn').textContent = autoRotate ? '⏸ Stop Auto' : '↻ Auto Rotate';
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      rotationController.reset();
+      autoRotate = false;
+      document.getElementById('rotateBtn').textContent = '↻ Auto Rotate';
+    });
+
+    document.getElementById('animateBtn').addEventListener('click', function() {
+      this.textContent = this.textContent.startsWith('▶') ? '⏸ Pause' : '▶ Start Animation';
+    });
+
+    // Utility functions
+    function hslToRgb(h, s, l) {
+      let r, g, b;
+      if (s === 0) {
+        r = g = b = l;
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1/6) return p + (q - p) * 6 * t;
+          if (t < 1/2) return q;
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+          return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1/3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1/3);
+      }
+      return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    // Stats
+    let frameCount = 0;
+    let lastTime = Date.now();
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (autoRotate) {
+        mainGroup.rotation.y += autoRotateSpeed;
+      }
+
+      animationEngine.update(0.016, meshes);
+
+      renderer.render(scene, camera);
+
+      // Update stats
+      frameCount++;
+      const now = Date.now();
+      if (now - lastTime >= 1000) {
+        document.getElementById('fps').textContent = frameCount;
+        document.getElementById('objectCount').textContent = meshes.size;
+        document.getElementById('animCount').textContent = sceneData.animations.length;
+        frameCount = 0;
+        lastTime = now;
+      }
+    }
+
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    });
+  </script>
+</body>
+</html>
