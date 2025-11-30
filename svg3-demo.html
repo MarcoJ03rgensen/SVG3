@@ -299,6 +299,8 @@
           <option value="">Select Example</option>
           <option value="INLINE">Demo Inline Scene</option>
           <option value="scenes/character-example.svg3">Character Example</option>
+          <option value="scenes/character-example-functional.svg3">Character Example (Functional)</option>
+          <option value="scenes/tree.svg3">Tree Example</option>
         </select>
       </div>
 
@@ -555,11 +557,21 @@
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
-      const distance = maxDim / (2 * Math.tan(Math.PI * camera.fov / 360));
 
-      // Position camera to view the entire scene
-      camera.position.copy(center);
-      camera.position.z += distance * 1.5; // Add some padding
+      // Compute required distance using both vertical and horizontal FOV
+      const vFOV = THREE.MathUtils.degToRad(camera.fov);
+      const hFOV = 2 * Math.atan(Math.tan(vFOV / 2) * camera.aspect);
+      const distV = maxDim / (2 * Math.tan(vFOV / 2));
+      const distH = maxDim / (2 * Math.tan(hFOV / 2));
+      let distance = Math.max(distV, distH);
+
+      // Ensure a reasonable minimum distance so small objects aren't too close
+      const minDistance = Math.max(1, maxDim * 0.8);
+      distance = Math.max(distance, minDistance);
+
+      // Place camera on Z axis relative to center and give extra padding
+      const padding = 1.8; // slightly larger padding for tall/narrow objects
+      camera.position.set(center.x, center.y, center.z + distance * padding);
       camera.lookAt(center);
 
       // Update controls if needed
