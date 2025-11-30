@@ -455,6 +455,7 @@
           mesh.castShadow = el.attrs.castShadow || false;
           mesh.visible = false; // Start hidden
           meshes.set(el.id, mesh);
+          console.debug('[SVG3] built mesh:', el.id, mesh.geometry && mesh.geometry.parameters);
           parentGroup.add(mesh);
 
           el.animations.forEach(anim => {
@@ -468,6 +469,7 @@
           group.rotation.set(...rot);
           group.visible = true; // Groups always visible
           meshes.set(el.id, group);
+          console.debug('[SVG3] built group:', el.id);
           parentGroup.add(group);
           el.children?.forEach(child => buildElement(child, group));
         } else if (el.tag === 'light') {
