@@ -311,7 +311,7 @@
   <script type="module">
     // Import SVG3 classes
     const SVG3_IMPLEMENTATION = `
-    export class SVG3Parser {
+    class SVG3Parser {
       constructor() {
         this.geometries = new Map();
         this.materials = new Map();
@@ -463,7 +463,7 @@
       }
     }
 
-    export class AnimationEngine {
+    class AnimationEngine {
       constructor() {
         this.activeAnimations = new Map();
         this.clock = { time: 0, delta: 0 };
