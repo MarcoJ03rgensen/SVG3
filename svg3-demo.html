@@ -722,6 +722,8 @@
         const objectSelect = document.getElementById('objectSelect');
         if (meshes.has('character-root')) {
           objectSelect.value = 'character-root';
+        } else if (meshes.has('tree-root')) {
+          objectSelect.value = 'tree-root';
         } else {
           // pick first mesh id available
           const firstMeshId = Array.from(meshes.keys()).find(id => id && (meshes.get(id).isMesh || meshes.get(id).type === 'Mesh'));
