@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG3 Local Example</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a2e;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      color: #32b8c6;
+    }
+    #error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ff6b6b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Loading SVG3 Scene...</div>
+  <div id="error" style="display: none;"></div>
+  <canvas id="canvas"></canvas>
+
+  <script type="module">
+    // Import SVG3 implementation
+    import { SVG3Parser, SVG3ThreeRenderer } from './svg3-complete.js';
+
+    async function loadAndRenderSVG3() {
+      try {
+        // Load SVG3 scene file
+        const response = await fetch('./scenes/demo.svg3');
+        if (!response.ok) {
+          throw new Error(`Failed to load SVG3 file: ${response.status}`);
+        }
+
+        const svgString = await response.text();
+
+        // Parse SVG3
+        const parser = new SVG3Parser();
+        const sceneData = parser.parse(svgString);
+
+        // Setup renderer
+        const canvas = document.getElementById('canvas');
+        const renderer = new SVG3ThreeRenderer(sceneData, canvas);
+        await renderer.init();
+
+        // Hide loading, start animation
+        document.getElementById('loading').style.display = 'none';
+        renderer.animate();
+
+        // Add mouse controls for rotation
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+
+          const deltaX = e.clientX - previousMousePosition.x;
+          const deltaY = e.clientY - previousMousePosition.y;
+
+          // Rotate the scene based on mouse movement
+          if (renderer.scene) {
+            renderer.scene.rotation.y += deltaX * 0.01;
+            renderer.scene.rotation.x += deltaY * 0.01;
+          }
+
+          previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        canvas.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+          isDragging = false;
+        });
+
+      } catch (error) {
+        console.error('Error loading SVG3:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').innerHTML = `
+          <h2>Error Loading SVG3</h2>
+          <p>${error.message}</p>
+          <p>Make sure you're running this from a local server.</p>
+          <p>Try: <code>python -m http.server 8000</code> then visit <code>http://localhost:8000/local-example.html</code></p>
+        `;
+      }
+    }
+
+    // Start loading
+    loadAndRenderSVG3();
+  </script>
+</body>
+</html>
