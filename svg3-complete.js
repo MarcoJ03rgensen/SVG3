@@ -153,7 +153,13 @@ export class SVG3Parser {
       const value = attr.value;
 
       if (['position', 'rotation', 'scale'].includes(name)) {
-        attrs[name] = value.split(',').map(v => parseFloat(v.trim()));
+        // Position/scale remain as numbers; rotation in XML is expressed in degrees
+        // Convert rotation degrees -> radians so downstream code can use radians consistently
+        if (name === 'rotation') {
+          attrs[name] = value.split(',').map(v => parseFloat(v.trim()) * Math.PI / 180);
+        } else {
+          attrs[name] = value.split(',').map(v => parseFloat(v.trim()));
+        }
       } else if (['fov', 'aspect', 'near', 'far', 'intensity', 'metalness', 
                   'roughness', 'emissiveIntensity', 'shininess', 'opacity'].includes(name)) {
         attrs[name] = parseFloat(value);
@@ -584,7 +590,9 @@ export class AnimationEngine {
     const interpolated = fromValues.map((from, i) => from + (toValues[i] - from) * progress);
 
     if (anim.attributeName === 'rotation') {
-      obj.rotation.set(...interpolated);
+      // Animations provide rotation values in degrees in XML; convert to radians
+      const rad = interpolated.map(v => v * Math.PI / 180);
+      obj.rotation.set(...rad);
     } else if (anim.attributeName === 'position') {
       obj.position.set(...interpolated);
     } else if (anim.attributeName === 'scale') {
