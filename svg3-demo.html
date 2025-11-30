@@ -501,6 +501,9 @@
 
       // Populate select
       const select = document.getElementById('objectSelect');
+      console.debug('[SVG3] meshes size:', meshes.size);
+      console.debug('[SVG3] mesh keys:', Array.from(meshes.keys()));
+      console.debug('[SVG3] select element:', select);
       select.innerHTML = '<option value="">Select Object</option>';
       const meshIds = Array.from(meshes.keys()).filter(id => meshes.get(id).type === 'Mesh');
       meshIds.forEach(id => {
