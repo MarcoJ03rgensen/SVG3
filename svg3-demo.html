@@ -823,6 +823,12 @@
         const text = await file.text();
         const newSceneData = parser.parse(text);
         buildScene(newSceneData);
+        // If auto-scale is enabled, perform a fit to ensure examples are framed
+        try {
+          if (document.getElementById('autoScaleToggle') && document.getElementById('autoScaleToggle').checked) {
+            document.getElementById('fitBtn').click();
+          }
+        } catch (e) { console.warn('[SVG3] auto-fit after load failed', e); }
         document.getElementById('objectSelect').value = '';
         rotationController.setTarget(scene);
         animationsEnabled = true;
