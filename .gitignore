@@ -26,3 +26,5 @@ npm-debug.log*
 .tmp/
 temp/
 local-example.html
+example.svg
+svg3-url-loader-demo.html
