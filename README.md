@@ -16,6 +16,28 @@ SVG3 is an **XML-based 3D graphics format** that bridges SVG simplicity with 3D 
 
 ---
 
+**How SVG3 differs from Three.js (JS) scene code**
+
+- **Format vs. API**: SVG3 is a declarative XML format (like SVG) that describes scene structure, geometries, materials and animations in a data file. Three.js scene code is imperative JavaScript that builds a scene by creating objects, setting properties and calling methods.
+
+- **Human-editable & Portable**: An `.svg3` file is human-readable and can be edited in any text editor or generated/exported from tools. A Three.js scene is a JS program — harder to port or safely import into other environments without executing code.
+
+- **Separation of data and renderer**: With SVG3 you write scene data only. The `SVG3Parser` + `SVG3ThreeRenderer` (or `SVG3Loader`) parse that data and create Three.js objects at runtime. This allows multiple renderers, server-side processing, or exporting to other formats.
+
+- **Safer loading**: Loading `.svg3` files only requires parsing XML and applying a known mapping to Three.js primitives — you do not execute arbitrary JS. That reduces risk and simplifies use in CMS, UIs, or user uploads.
+
+- **Declarative animation**: SVG3 uses SVG-style `<animate>` elements to describe animations (from/to, keyframes, durations, repeat). Three.js animations are normally expressed imperatively (tweens, AnimationMixer clips) and require code to construct them.
+
+- **Easier tooling & conversion**: Because SVG3 is data-driven (JSON-like after parsing), you can convert it to engine-specific formats (Unity, Godot, glTF helpers) or export a JSON scene for server-side pipelines.
+
+- **When to use which**:
+  - Use **SVG3** when you want portable, human-editable scenes, content uploaded by non-developers, or a unified declarative format across tools.
+  - Use **plain Three.js code** when you need highly custom runtime logic, procedural generation, or low-level performance optimizations that rely on custom JS.
+
+The rest of this README and the codebase show how to parse `.svg3` files and render them with Three.js while keeping these advantages.
+
+---
+
 ## 📚 Documentation Index
 
 ### Getting Started
