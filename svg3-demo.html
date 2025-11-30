@@ -294,6 +294,15 @@
       </div>
 
       <div class="control-section">
+        <h3>📂 Examples</h3>
+        <select id="exampleSelect">
+          <option value="">Select Example</option>
+          <option value="INLINE">Demo Inline Scene</option>
+          <option value="scenes/character-example.svg3">Character Example</option>
+        </select>
+      </div>
+
+      <div class="control-section">
         <h3>📈 Stats</h3>
         
         <div class="stat">
@@ -629,6 +638,31 @@
         rotationController.setTarget(scene);
         animationsEnabled = true;
         document.getElementById('animateBtn').textContent = '⏸ Pause Animation';
+      }
+    });
+
+    // Examples loader
+    document.getElementById('exampleSelect').addEventListener('change', async (e) => {
+      const val = e.target.value;
+      if (!val) return;
+      try {
+        if (val === 'INLINE') {
+          buildScene(sceneData);
+          currentSceneData = sceneData;
+        } else {
+          const resp = await fetch(val);
+          if (!resp.ok) throw new Error('Failed to fetch example: ' + resp.status);
+          const text = await resp.text();
+          const newSceneData = parser.parse(text);
+          buildScene(newSceneData);
+          currentSceneData = newSceneData;
+        }
+        document.getElementById('objectSelect').value = '';
+        rotationController.setTarget(scene);
+        animationsEnabled = true;
+        document.getElementById('animateBtn').textContent = '⏸ Pause Animation';
+      } catch (err) {
+        console.error('[SVG3] failed to load example', val, err);
       }
     });
 
