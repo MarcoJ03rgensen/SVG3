@@ -73,7 +73,7 @@ class SVG3Loader {
   async parseAndRender(svg3Text) {
     // Embed SVG3 implementation (same as demo)
     const SVG3_IMPLEMENTATION = `
-export class SVG3Parser {
+class SVG3Parser {
   constructor() {
     this.geometries = new Map();
     this.materials = new Map();
@@ -256,7 +256,7 @@ export class SVG3Parser {
   }
 }
 
-export class SVG3ThreeRenderer {
+class SVG3ThreeRenderer {
   constructor(sceneData, canvas) {
     this.sceneData = sceneData;
     this.canvas = canvas;
