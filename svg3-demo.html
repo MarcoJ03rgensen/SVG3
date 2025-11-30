@@ -278,7 +278,7 @@
           <button id="rotateBtn">↻ Auto Rotate</button>
           <button id="resetBtn">🔄 Reset</button>
         </div>
-        <button id="animateBtn" style="width: 100%">▶ Start Animation</button>
+        <button id="animateBtn" style="width: 100%">⏸ Pause Animation</button>
       </div>
 
       <div class="control-section">
@@ -393,6 +393,7 @@
 
     // Global
     let currentSceneData = null;
+    let animationsEnabled = true;
 
     function buildScene(sceneData) {
       currentSceneData = sceneData;
@@ -500,6 +501,40 @@
       const select = document.getElementById('objectSelect');
       select.innerHTML = '<option value="">Select Object</option>' + 
         Array.from(meshes.keys()).map(id => `<option value="${id}">${id}</option>`).join('');
+
+      // Center camera on scene
+      centerCameraOnScene();
+    }
+
+    function centerCameraOnScene() {
+      if (meshes.size === 0) return;
+
+      // Calculate bounding box
+      const box = new THREE.Box3();
+      meshes.forEach((obj, id) => {
+        if (obj.type === 'Mesh' && obj.visible) {
+          box.expandByObject(obj);
+        }
+      });
+
+      if (box.isEmpty()) return;
+
+      // Get center and size
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const distance = maxDim / (2 * Math.tan(Math.PI * camera.fov / 360));
+
+      // Position camera to view the entire scene
+      camera.position.copy(center);
+      camera.position.z += distance * 1.5; // Add some padding
+      camera.lookAt(center);
+
+      // Update controls if needed
+      if (rotationController.targetObject) {
+        rotationController.reset();
+      }
+    }
     }
 
     // Initial build
@@ -530,6 +565,8 @@
         buildScene(newSceneData);
         document.getElementById('objectSelect').value = '';
         rotationController.setTarget(scene);
+        animationsEnabled = true;
+        document.getElementById('animateBtn').textContent = '⏸ Pause Animation';
       }
     });
 
@@ -590,7 +627,8 @@
     });
 
     document.getElementById('animateBtn').addEventListener('click', function() {
-      this.textContent = this.textContent.startsWith('▶') ? '⏸ Pause' : '▶ Start Animation';
+      animationsEnabled = !animationsEnabled;
+      this.textContent = animationsEnabled ? '⏸ Pause Animation' : '▶ Start Animation';
     });
 
     // Utility functions
@@ -635,7 +673,9 @@
       //   }
       // }
 
-      animationEngine.update(0.016, meshes);
+      if (animationsEnabled) {
+        animationEngine.update(0.016, meshes);
+      }
 
       renderer.render(scene, camera);
 
