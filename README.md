@@ -159,6 +159,258 @@ gameController.setupBones([
 
 ---
 
+## 📝 Writing SVG3 Files
+
+### Basic Structure
+Every SVG3 file is valid XML with this structure:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<svg3 version="1.0" xmlns="https://github.com/MarcoJ03rgensen/SVG3" viewBox="0 0 1920 1080">
+  <!-- Metadata (optional) -->
+  <metadata>
+    <creator>Your Name</creator>
+    <created>2025-11-30</created>
+    <description>My 3D Scene</description>
+  </metadata>
+  
+  <!-- Definitions (geometries, materials) -->
+  <defs>
+    <!-- Define reusable geometries -->
+    <geometry id="myBox" type="box" width="2" height="2" depth="2" />
+    <geometry id="mySphere" type="sphere" radius="1" widthSegments="32" heightSegments="32" />
+    
+    <!-- Define reusable materials -->
+    <material id="redPlastic" type="standard" color="#ff0000" metalness="0.1" roughness="0.8" />
+    <material id="metal" type="standard" color="#cccccc" metalness="0.9" roughness="0.2" />
+  </defs>
+  
+  <!-- Scene definition -->
+  <scene id="main" camera="mainCamera" ambientLight="0.6">
+    <!-- Camera -->
+    <camera id="mainCamera" type="perspective" fov="75" aspect="16/9" near="0.1" far="1000" position="0,0,6" />
+    
+    <!-- Lights -->
+    <light type="directional" intensity="1" color="#ffffff" position="5,5,5" />
+    <light type="point" intensity="0.5" color="#00ff00" position="-3,2,3" />
+    
+    <!-- 3D Objects -->
+    <mesh id="cube" geometry="myBox" material="redPlastic" position="-2,0,0" rotation="0,0,0" scale="1,1,1" castShadow="true" receiveShadow="true">
+      <animate attributeName="rotation" from="0,0,0" to="0,6.28,0" dur="4s" repeatCount="indefinite" />
+    </mesh>
+    
+    <mesh id="ball" geometry="mySphere" material="metal" position="2,0,0" castShadow="true" receiveShadow="true" />
+    
+    <!-- Groups for organization -->
+    <group id="character" position="0,-2,0">
+      <mesh id="body" geometry="myBox" material="redPlastic" />
+      <mesh id="head" geometry="mySphere" material="metal" position="0,1.5,0" />
+    </group>
+  </scene>
+</svg3>
+```
+
+### Geometry Types
+| Type | Parameters | Description |
+|------|------------|-------------|
+| `box` | `width`, `height`, `depth` | Rectangular prism |
+| `sphere` | `radius`, `widthSegments`, `heightSegments` | Sphere (default 32x32) |
+| `cylinder` | `radiusTop`, `radiusBottom`, `height`, `radialSegments` | Cylinder/cone |
+| `plane` | `width`, `height`, `widthSegments`, `heightSegments` | Flat surface |
+| `torus` | `radius`, `tube`, `radialSegments`, `tubularSegments` | Donut shape |
+
+### Material Types
+| Type | Parameters | Description |
+|------|------------|-------------|
+| `standard` | `color`, `metalness`, `roughness`, `emissive` | PBR material |
+| `phong` | `color`, `shininess`, `specular` | Classic shiny material |
+| `lambert` | `color`, `emissive` | Matte material |
+| `basic` | `color`, `wireframe` | Simple colored material |
+
+### Animation Syntax
+```xml
+<!-- Rotate continuously -->
+<animate attributeName="rotation" from="0,0,0" to="0,6.28,0" dur="2s" repeatCount="indefinite" />
+
+<!-- Move back and forth -->
+<animate attributeName="position" from="-2,0,0" to="2,0,0" dur="3s" repeatCount="indefinite" />
+
+<!-- Scale with easing -->
+<animate attributeName="scale" from="1,1,1" to="2,2,2" dur="1s" begin="click" fill="freeze" />
+
+<!-- Keyframe animation -->
+<animate attributeName="rotation" values="0,0,0;0,1.57,0;0,3.14,0;0,4.71,0;0,6.28,0" keyTimes="0;0.25;0.5;0.75;1" dur="4s" repeatCount="indefinite" />
+```
+
+### File Naming
+- Save as `.svg3` extension
+- Use descriptive names: `character.svg3`, `scene.svg3`, `model.svg3`
+- Upload to your web server or GitHub repository
+
+---
+
+## 🔗 Using SVG3 in Applications
+
+### Method 1: Direct Import (ES Modules)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <script type="module">
+    import { SVG3Parser, SVG3ThreeRenderer } from './svg3-complete.js';
+    
+    // Load and parse SVG3 file
+    async function loadSVG3(url) {
+      const response = await fetch(url);
+      const xmlText = await response.text();
+      
+      const parser = new SVG3Parser();
+      const sceneData = parser.parse(xmlText);
+      
+      // Create renderer
+      const canvas = document.getElementById('canvas');
+      const renderer = new SVG3ThreeRenderer(sceneData, canvas);
+      
+      // Initialize and start
+      await renderer.init();
+      renderer.animate();
+      
+      // Optional: Enable rotation
+      renderer.setupRotationControl('object-id', 0.01);
+      
+      return renderer;
+    }
+    
+    // Load your SVG3 file
+    loadSVG3('path/to/your/model.svg3');
+  </script>
+</body>
+</html>
+```
+
+### Method 2: Using the Loader (Non-Module)
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="svg3-loader.js"></script>
+</head>
+<body>
+  <div id="container"></div>
+  
+  <script>
+    // Load SVG3 into a container
+    SVG3Loader.load('path/to/your/model.svg3', document.getElementById('container'), {
+      width: 800,
+      height: 600,
+      enableRotation: true,
+      rotationSpeed: 0.01
+    });
+  </script>
+</body>
+</html>
+```
+
+### Method 3: Game Integration
+```javascript
+import { SVG3Parser, SVG3ThreeRenderer, enableGameControls } from './svg3-complete.js';
+
+// Load character
+const parser = new SVG3Parser();
+const sceneData = parser.parse(yourSVG3XML);
+const renderer = new SVG3ThreeRenderer(sceneData, canvas);
+await renderer.init();
+
+// Enable game controls
+const gameController = enableGameControls(renderer);
+
+// Create character with bones
+const character = new GameCharacter('Hero', gameController, [
+  { id: 'torso', parent: null },
+  { id: 'head', parent: 'torso' },
+  { id: 'left-arm', parent: 'torso' },
+  { id: 'right-arm', parent: 'torso' },
+  { id: 'left-leg', parent: 'torso' },
+  { id: 'right-leg', parent: 'torso' }
+]);
+
+// Control the character
+character.walk(2.0); // Walk at 2 units/second
+character.jump(3.0, 0.8); // Jump 3 units high, 0.8 seconds
+
+// Animation state machine
+character.stateMachine.addState('idle', (gc, dt) => {
+  // Idle animation logic
+});
+
+character.stateMachine.addState('running', (gc, dt) => {
+  // Running animation
+});
+
+character.stateMachine.transitionTo('idle');
+```
+
+### Method 4: React/Vue Integration
+```javascript
+import React, { useEffect, useRef } from 'react';
+import { SVG3Loader } from './svg3-loader.js';
+
+function SVG3Viewer({ src, width = 800, height = 600 }) {
+  const containerRef = useRef();
+  
+  useEffect(() => {
+    if (containerRef.current) {
+      SVG3Loader.load(src, containerRef.current, {
+        width,
+        height,
+        enableRotation: true
+      });
+    }
+  }, [src, width, height]);
+  
+  return <div ref={containerRef} />;
+}
+
+export default SVG3Viewer;
+
+// Usage: <SVG3Viewer src="model.svg3" />
+```
+
+### Method 5: Node.js/Server-Side Processing
+```javascript
+const fs = require('fs');
+const { SVG3Parser } = require('./svg3-complete.js');
+
+// Load and parse SVG3 file
+const xmlContent = fs.readFileSync('model.svg3', 'utf8');
+const parser = new SVG3Parser();
+const sceneData = parser.parse(xmlContent);
+
+// Export to JSON for game engines
+fs.writeFileSync('model.json', JSON.stringify(sceneData, null, 2));
+
+// Or convert to other formats
+console.log('Geometries:', sceneData.defs.geometries.length);
+console.log('Materials:', sceneData.defs.materials.length);
+console.log('Objects:', sceneData.scenes[0].children.length);
+```
+
+### Deployment Checklist
+- [ ] Save file as `.svg3` extension
+- [ ] Upload to web server or GitHub Pages
+- [ ] Ensure CORS headers allow fetching (for web apps)
+- [ ] Test loading in target application
+- [ ] Validate XML syntax (use online XML validator)
+- [ ] Check file size (keep under 1MB for web loading)
+
+---
+
 ## 💡 Use Cases
 
 ✅ **Game Development** - Character animation, NPC control, ragdoll physics
