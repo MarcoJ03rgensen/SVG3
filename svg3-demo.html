@@ -557,16 +557,28 @@
     // Object selection
     document.getElementById('objectSelect').addEventListener('change', (e) => {
       const selected = e.target.value;
+
+      // Toggle visibility: if no selection, show all; otherwise show only selected mesh
       meshes.forEach((obj, id) => {
-        if (obj.type === 'Mesh') {
+        const isMesh = obj && (obj.isMesh === true || obj.type === 'Mesh');
+        if (!isMesh) return;
+        if (!selected) {
+          obj.visible = true;
+        } else {
           obj.visible = id === selected;
         }
       });
-      // Update rotation controller target
-      if (selected) {
-        rotationController.setTarget(meshes.get(selected));
+
+      // Update rotation controller target and center camera
+      if (selected && meshes.has(selected)) {
+        const selObj = meshes.get(selected);
+        rotationController.setTarget(selObj);
+        // ensure selected object is visible and center on it
+        selObj.visible = true;
+        centerCameraOnScene();
       } else {
         rotationController.setTarget(scene);
+        centerCameraOnScene();
       }
     });
 
