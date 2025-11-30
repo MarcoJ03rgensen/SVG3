@@ -18,6 +18,7 @@ export class SVG3Parser {
     this.geometries = new Map();
     this.materials = new Map();
     this.animationTracks = [];
+    this._autoIdCounter = 0;
   }
 
   parse(svgString) {
@@ -114,6 +115,12 @@ export class SVG3Parser {
       attrs: this.parseAttributes(el),
       animations: this.parseAnimations(el),
     };
+
+    // Auto-generate an id if the element doesn't have one so downstream code can reference it
+    if (!element.id || element.id.trim() === '') {
+      this._autoIdCounter += 1;
+      element.id = `auto-${element.tag}-${this._autoIdCounter}`;
+    }
 
     if (['group', 'scene'].includes(el.tagName)) {
       element.children = this.parseChildren(el);
