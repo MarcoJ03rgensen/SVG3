@@ -456,8 +456,18 @@
       // Build scene graph
       function buildElement(el, parentGroup) {
         if (el.tag === 'mesh') {
-          const geom = geometries.get(el.attrs.geometry);
-          const mat = materials.get(el.attrs.material).clone();
+          let geom = geometries.get(el.attrs.geometry);
+          if (!geom) {
+            console.warn('[SVG3] missing geometry for', el.id, el.attrs && el.attrs.geometry);
+            geom = new THREE.BoxGeometry(1,1,1);
+          }
+
+          let baseMat = materials.get(el.attrs.material);
+          if (!baseMat) {
+            console.warn('[SVG3] missing material for', el.id, el.attrs && el.attrs.material);
+            baseMat = new THREE.MeshStandardMaterial({ color: 0xff00ff });
+          }
+          const mat = baseMat.clone();
           const mesh = new THREE.Mesh(geom, mat);
           mesh.name = el.id;
           const pos = el.attrs.position || [0, 0, 0];
