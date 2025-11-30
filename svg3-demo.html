@@ -519,13 +519,34 @@
         }
       }
 
+      // Build into a single container so we can auto-scale/transform the whole example
+      const container = new THREE.Group();
+      container.name = 'svg3-container';
       sceneData.scenes[0].children.forEach(el => {
-        buildElement(el, scene);
+        buildElement(el, container);
       });
+      scene.add(container);
 
       // Set ambient light
       const ambientLight = new THREE.AmbientLight(0xffffff, sceneData.scenes[0].ambientLight || 0.6);
       scene.add(ambientLight);
+
+      // Auto-scale container to a reasonable target size if input scene is unusually small/large
+      try {
+        const tmpBox = new THREE.Box3().setFromObject(container);
+        if (!tmpBox.isEmpty()) {
+          const tmpSize = tmpBox.getSize(new THREE.Vector3());
+          const tmpMax = Math.max(tmpSize.x, tmpSize.y, tmpSize.z);
+          const target = 4; // desired scene max dimension (tunable)
+          if (tmpMax > 0 && (tmpMax < target * 0.6 || tmpMax > target * 1.6)) {
+            const scaleFactor = target / tmpMax;
+            container.scale.setScalar(scaleFactor);
+            console.debug('[SVG3] auto-scaled container by', scaleFactor, 'original max', tmpMax);
+          }
+        }
+      } catch (e) {
+        console.warn('[SVG3] auto-scale failed', e);
+      }
 
       // Ensure all meshes are visible after building the scene (defensive)
       meshes.forEach((obj) => {
