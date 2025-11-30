@@ -321,6 +321,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script type="module">
+    window.addEventListener('DOMContentLoaded', () => {
     // Import SVG3 classes
     import { SVG3Parser, AnimationEngine, RotationController } from './svg3-complete.js';
 
@@ -499,9 +500,14 @@
 
       // Populate select
       const select = document.getElementById('objectSelect');
+      select.innerHTML = '<option value="">Select Object</option>';
       const meshIds = Array.from(meshes.keys()).filter(id => meshes.get(id).type === 'Mesh');
-      select.innerHTML = '<option value="">Select Object</option>' + 
-        meshIds.map(id => `<option value="${id}">${id}</option>`).join('');
+      meshIds.forEach(id => {
+        const option = document.createElement('option');
+        option.value = id;
+        option.textContent = id;
+        select.appendChild(option);
+      });
 
       // Center camera on scene
       centerCameraOnScene();
@@ -701,6 +707,7 @@
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
+    });
     });
   </script>
 </body>
