@@ -325,6 +325,7 @@
           <option value="scenes/character-example.svg3">Character Example</option>
           <option value="scenes/character-example-functional.svg3">Character Example (Functional)</option>
           <option value="scenes/tree.svg3">Tree Example</option>
+          <option value="NEXUS:scenes/tree.svg3">Tree Example (NEXUS Renderer)</option>
         </select>
       </div>
 
@@ -432,6 +433,8 @@
     let currentSceneData = null;
     let animationsEnabled = true;
     let rotationController = null;
+    let usingNexus = false;
+    let nexusSystem = null;
 
     function buildScene(sceneData) {
       currentSceneData = sceneData;
@@ -843,6 +846,29 @@
       console.debug('[SVG3] exampleSelect -> loading', val);
       try {
         let newSceneData = null;
+        // Support running scenes using external SVG3-NEXUS renderer if prefixed with "NEXUS:"
+        if (val.startsWith('NEXUS:')) {
+          const url = val.split(':')[1];
+          try {
+            const mod = await import('./svg3-nexus-system.js');
+            const SVG3NEXUS = mod.default;
+            // If another nexus system is running, stop/update it
+            if (nexusSystem && nexusSystem.renderer && typeof nexusSystem.renderer.stop === 'function') {
+              try { nexusSystem.renderer.stop(); } catch(_) {}
+            }
+            // Create and load scene using Nexus runtime (it manages its own renderer loop)
+            nexusSystem = await SVG3NEXUS.load(canvas, url);
+            usingNexus = true;
+            document.getElementById('debugOutput').textContent = 'Using NEXUS renderer for: ' + url;
+            // Disable object selection UI while Nexus is active
+            document.getElementById('objectSelect').disabled = true;
+            // Do not continue with the regular SVG3 renderer build
+            return;
+          } catch (nerr) {
+            console.warn('[SVG3] failed to start NEXUS renderer', nerr);
+            // fall back to regular parsing below
+          }
+        }
         if (val === 'INLINE') {
           newSceneData = sceneData;
         } else {
@@ -859,6 +885,16 @@
             console.error('[SVG3] parser.parse failed for example', val, pe);
             throw pe;
           }
+        }
+
+        // If we previously used the Nexus renderer, re-enable our UI and stop Nexus
+        if (usingNexus && nexusSystem) {
+          try {
+            if (nexusSystem.renderer && typeof nexusSystem.renderer.stop === 'function') nexusSystem.renderer.stop();
+          } catch (e) {}
+          nexusSystem = null;
+          usingNexus = false;
+          document.getElementById('objectSelect').disabled = false;
         }
 
         buildScene(newSceneData);
