@@ -426,6 +426,7 @@
           case 'box': g = new THREE.BoxGeometry(p.width || 1, p.height || 1, p.depth || 1); break;
           case 'sphere': g = new THREE.SphereGeometry(p.radius || 1, p.widthSegments || 32, p.heightSegments || 32); break;
           case 'cylinder': g = new THREE.CylinderGeometry(p.radiusTop || 1, p.radiusBottom || 1, p.height || 2); break;
+          case 'cone': g = new THREE.ConeGeometry(p.radius || 1, p.height || 2, p.radialSegments || 16); break;
           case 'torus': g = new THREE.TorusGeometry(p.radius || 1, p.tube || 0.4, p.radialSegments || 16, p.tubularSegments || 100); break;
           default: g = new THREE.BoxGeometry(1, 1, 1);
         }
@@ -443,6 +444,8 @@
             color: p.color || 0xffffff,
             metalness: p.metalness || 0,
             roughness: p.roughness || 0.5,
+            emissive: p.emissive || (p.color && p.emissive ? p.emissive : undefined),
+            emissiveIntensity: p.emissiveIntensity !== undefined ? parseFloat(p.emissiveIntensity) : 0,
           });
         }
         materials.set(mat.id, m);
@@ -466,6 +469,9 @@
           meshes.set(el.id, mesh);
           console.debug('[SVG3] built mesh:', el.id, mesh.geometry && mesh.geometry.parameters);
           parentGroup.add(mesh);
+
+          // Build any child elements nested inside this mesh (allow nested meshes/groups)
+          el.children?.forEach(child => buildElement(child, mesh));
 
           el.animations.forEach(anim => {
             animationEngine.registerAnimation(el.id, anim);
