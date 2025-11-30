@@ -640,8 +640,9 @@
 
         // If a group was selected, show all descendant meshes of that group
         try { selObj.updateMatrixWorld(true); } catch (err) {}
-        selObj.traverse(o => {
-          if (o.isMesh) o.visible = true;
+        // for group, show all meshes
+        meshes.forEach((obj, id) => {
+          if (obj && (obj.isMesh === true || obj.type === 'Mesh')) obj.visible = true;
         });
         rotationController.setTarget(selObj);
         // center on the group as a whole

@@ -27,7 +27,7 @@
     <light type="point" color="#00ffff" intensity="0.7" position="0,2,2" />
 
     <!-- Character root group (flat structure) -->
-    <group id="character-root" position="0, -2, 0" rotation="180,0,0">
+    <group id="character-root" position="0, -2, 0">
       <animate attributeName="position" values="0,-2,0;0,-1.8,0;0,-2,0" dur="4s" repeatCount="indefinite" />
 
       <!-- Pelvis / Hip -->
