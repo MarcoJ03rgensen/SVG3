@@ -467,7 +467,7 @@
           mesh.rotation.set(...rot);
           mesh.scale.set(...scale);
           mesh.castShadow = el.attrs.castShadow || false;
-          mesh.visible = false; // Start hidden
+          mesh.visible = true; // Start visible by default so examples show all parts
           meshes.set(el.id, mesh);
           console.debug('[SVG3] built mesh:', el.id, mesh.geometry && mesh.geometry.parameters);
           parentGroup.add(mesh);
@@ -516,6 +516,11 @@
       // Set ambient light
       const ambientLight = new THREE.AmbientLight(0xffffff, sceneData.scenes[0].ambientLight || 0.6);
       scene.add(ambientLight);
+
+      // Ensure all meshes are visible after building the scene (defensive)
+      meshes.forEach((obj) => {
+        if (obj && (obj.isMesh === true || obj.type === 'Mesh')) obj.visible = true;
+      });
 
       // Populate select (list all mesh objects regardless of initial visibility)
       const select = document.getElementById('objectSelect');
@@ -569,9 +574,11 @@
       const minDistance = Math.max(1, maxDim * 0.8);
       distance = Math.max(distance, minDistance);
 
-      // Place camera on Z axis relative to center and give extra padding
+      // Place camera around the scene center and give extra padding
       const padding = 2.0; // increased padding for better framing
-      camera.position.set(center.x, 2, center.z + distance * padding);
+      // Place camera at a height relative to the scene center so tall objects aren't pushed down
+      const cameraY = center.y + Math.max(1.2, distance * 0.35);
+      camera.position.set(center.x, cameraY, center.z + distance * padding);
       camera.lookAt(center);
 
       // Update controls if needed
