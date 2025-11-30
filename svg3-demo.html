@@ -645,24 +645,49 @@
     document.getElementById('exampleSelect').addEventListener('change', async (e) => {
       const val = e.target.value;
       if (!val) return;
+      console.debug('[SVG3] exampleSelect -> loading', val);
       try {
+        let newSceneData = null;
         if (val === 'INLINE') {
-          buildScene(sceneData);
-          currentSceneData = sceneData;
+          newSceneData = sceneData;
         } else {
+          console.debug('[SVG3] fetching example file:', val);
           const resp = await fetch(val);
+          console.debug('[SVG3] fetch response', resp.status, resp.ok);
           if (!resp.ok) throw new Error('Failed to fetch example: ' + resp.status);
           const text = await resp.text();
-          const newSceneData = parser.parse(text);
-          buildScene(newSceneData);
-          currentSceneData = newSceneData;
+          console.debug('[SVG3] fetched example length:', text.length);
+          try {
+            newSceneData = parser.parse(text);
+            console.debug('[SVG3] parsed example scenes count:', newSceneData.scenes ? newSceneData.scenes.length : 0);
+          } catch (pe) {
+            console.error('[SVG3] parser.parse failed for example', val, pe);
+            throw pe;
+          }
         }
-        document.getElementById('objectSelect').value = '';
+
+        buildScene(newSceneData);
+        currentSceneData = newSceneData;
+
+        // Try to auto-select a reasonable root for the example
+        const objectSelect = document.getElementById('objectSelect');
+        if (meshes.has('character-root')) {
+          objectSelect.value = 'character-root';
+        } else {
+          // pick first mesh id available
+          const firstMeshId = Array.from(meshes.keys()).find(id => id && (meshes.get(id).isMesh || meshes.get(id).type === 'Mesh'));
+          objectSelect.value = firstMeshId || '';
+        }
+
+        // Trigger the change handler programmatically so selection logic runs
+        objectSelect.dispatchEvent(new Event('change'));
+
         rotationController.setTarget(scene);
         animationsEnabled = true;
         document.getElementById('animateBtn').textContent = '⏸ Pause Animation';
       } catch (err) {
         console.error('[SVG3] failed to load example', val, err);
+        alert('Failed to load example: ' + (err.message || err));
       }
     });
 
