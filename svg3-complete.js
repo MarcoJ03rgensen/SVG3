@@ -122,7 +122,8 @@ export class SVG3Parser {
       element.id = `auto-${element.tag}-${this._autoIdCounter}`;
     }
 
-    if (['group', 'scene'].includes(el.tagName)) {
+    if (['group', 'scene', 'mesh'].includes(el.tagName)) {
+      // Allow nested children inside meshes as well as groups/scenes
       element.children = this.parseChildren(el);
     }
 
