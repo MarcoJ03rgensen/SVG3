@@ -499,8 +499,9 @@
 
       // Populate select
       const select = document.getElementById('objectSelect');
+      const meshIds = Array.from(meshes.keys()).filter(id => meshes.get(id).type === 'Mesh');
       select.innerHTML = '<option value="">Select Object</option>' + 
-        Array.from(meshes.keys()).map(id => `<option value="${id}">${id}</option>`).join('');
+        meshIds.map(id => `<option value="${id}">${id}</option>`).join('');
 
       // Center camera on scene
       centerCameraOnScene();
