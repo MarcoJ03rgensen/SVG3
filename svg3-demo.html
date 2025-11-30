@@ -405,10 +405,8 @@
       meshes.clear();
       animationEngine.activeAnimations.clear();
 
-      // Remove old meshes/groups from scene, keep lights and camera
-      scene.children = scene.children.filter(child => 
-        child.type !== 'Mesh' && child.type !== 'Group' && child !== ambientLight
-      );
+      // Remove old meshes/groups from scene (keep lights/camera)
+      scene.children = scene.children.filter(child => child.type !== 'Mesh' && child.type !== 'Group');
 
       // Create geometries
       sceneData.defs.geometries.forEach(geom => {
@@ -499,17 +497,20 @@
       const ambientLight = new THREE.AmbientLight(0xffffff, sceneData.scenes[0].ambientLight || 0.6);
       scene.add(ambientLight);
 
-      // Populate select
+      // Populate select (list all mesh objects regardless of initial visibility)
       const select = document.getElementById('objectSelect');
       console.debug('[SVG3] meshes size:', meshes.size);
       console.debug('[SVG3] mesh keys:', Array.from(meshes.keys()));
       console.debug('[SVG3] select element:', select);
       select.innerHTML = '<option value="">Select Object</option>';
-      const meshIds = Array.from(meshes.keys()).filter(id => meshes.get(id).type === 'Mesh');
+      const meshIds = Array.from(meshes.keys()).filter(id => {
+        const obj = meshes.get(id);
+        return obj && (obj.isMesh === true || obj.type === 'Mesh');
+      });
       meshIds.forEach(id => {
         const option = document.createElement('option');
         option.value = id;
-        option.textContent = id;
+        option.textContent = (meshes.get(id) && meshes.get(id).name) || id;
         select.appendChild(option);
       });
 
@@ -520,11 +521,13 @@
     function centerCameraOnScene() {
       if (meshes.size === 0) return;
 
-      // Calculate bounding box
+      // Calculate bounding box from all objects in the meshes map
       const box = new THREE.Box3();
       meshes.forEach((obj, id) => {
-        if (obj.type === 'Mesh' && obj.visible) {
+        try {
           box.expandByObject(obj);
+        } catch (err) {
+          // ignore objects that can't be expanded
         }
       });
 
