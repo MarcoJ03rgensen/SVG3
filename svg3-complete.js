@@ -99,7 +99,7 @@ export class SVG3Parser {
 
   parseChildren(parent) {
     const children = [];
-    parent.children.forEach(child => {
+    Array.from(parent.children).forEach(child => {
       if (['mesh', 'group', 'light', 'camera'].includes(child.tagName)) {
         children.push(this.parseElement(child));
       }
