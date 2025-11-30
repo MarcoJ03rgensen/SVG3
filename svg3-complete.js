@@ -664,6 +664,10 @@ export class RotationController {
     this.sensitivity = s;
   }
 
+  setTarget(obj) {
+    this.targetObject = obj;
+  }
+
   reset() {
     this.rotation = { x: 0, y: 0, z: 0 };
     this.applyRotation();
