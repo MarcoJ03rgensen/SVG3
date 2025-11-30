@@ -396,6 +396,7 @@
     // Global
     let currentSceneData = null;
     let animationsEnabled = true;
+    let rotationController = null;
 
     function buildScene(sceneData) {
       currentSceneData = sceneData;
@@ -545,7 +546,7 @@
       camera.lookAt(center);
 
       // Update controls if needed
-      if (rotationController.targetObject) {
+      if (rotationController && rotationController.targetObject) {
         rotationController.reset();
       }
     }
@@ -617,7 +618,7 @@
     });
 
     // Setup rotation controller
-    const rotationController = new RotationController(canvas, scene, 0.01);
+    rotationController = new RotationController(canvas, scene, 0.01);
 
     // Auto-rotate toggle
     let autoRotate = false;
